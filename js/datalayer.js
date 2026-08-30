@@ -116,16 +116,59 @@
     }
   }
 
-  // ─── Adobe Data Layer (adobeDataLayer — Adobe standard) ───────────────────
-  // https://github.com/adobe/adobe-client-data-layer
-  window.adobeDataLayer = window.adobeDataLayer || [];
+  // ─── Adobe Data Layer — persistent across page navigations ───────────────
+  // Events are written to localStorage under "nexaBankDL_events" so the full
+  // history survives page redirects (login → dashboard, etc.).
+  // The in-memory window.adobeDataLayer is rehydrated from storage on every
+  // page load, making it always cumulative for DevTools inspection.
+  var DL_STORAGE_KEY = "nexaBankDL_events";
+  var DL_MAX_EVENTS  = 200;   // cap to prevent unbounded storage growth
+
+  function _loadFromStorage() {
+    try {
+      var raw = localStorage.getItem(DL_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function _saveToStorage(arr) {
+    try {
+      // Keep only the most recent DL_MAX_EVENTS entries
+      var trimmed = arr.length > DL_MAX_EVENTS ? arr.slice(-DL_MAX_EVENTS) : arr;
+      localStorage.setItem(DL_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (e) {
+      // Storage quota exceeded — fail silently
+    }
+  }
+
+  // Rehydrate: seed window.adobeDataLayer with the persisted history,
+  // then attach a custom push() that also writes to localStorage.
+  var _persisted = _loadFromStorage();
+  window.adobeDataLayer = _persisted.slice(); // start with full history
+
+  // Wrap Array.prototype.push on this specific instance so every future
+  // push is intercepted and persisted without touching the global prototype.
+  var _originalPush = Array.prototype.push;
+  window.adobeDataLayer.push = function () {
+    var result = _originalPush.apply(this, arguments);
+    _saveToStorage(this);
+    return result;
+  };
 
   function pushEvent(eventName, payload) {
-    var entry = Object.assign({ event: eventName }, payload);
+    var entry = Object.assign({ event: eventName, _ts: new Date().toISOString() }, payload);
     window.adobeDataLayer.push(entry);
     log(eventName, entry);
     return entry;
   }
+
+  /**
+   * NexaBankDL.clearHistory()
+   * Utility: wipe persisted event history (useful for resetting between demos).
+   * Call from browser console: NexaBankDL.clearHistory()
+   */
 
   // ═══════════════════════════════════════════════════════════════════════════
   // PUBLIC API
@@ -607,13 +650,43 @@
     sendToAEP(xdm);
   };
 
+  // ─── clearHistory() — public utility ─────────────────────────────────────
+  NexaBankDL.clearHistory = function () {
+    try { localStorage.removeItem(DL_STORAGE_KEY); } catch (e) {}
+    window.adobeDataLayer.length = 0;
+    log("clearHistory", { message: "Event history cleared. window.adobeDataLayer is now empty." });
+  };
+
+  // ─── getHistory() — public utility ───────────────────────────────────────
+  NexaBankDL.getHistory = function () {
+    return window.adobeDataLayer.slice();
+  };
+
   // ─── Debug badge (visible in browser when debugMode = true) ───────────────
   if (CONFIG.debugMode) {
     document.addEventListener("DOMContentLoaded", function () {
+      var count = window.adobeDataLayer.length;
       var badge = document.createElement("div");
       badge.id = "dl-debug-badge";
-      badge.title = "Adobe DataLayer Debug Mode — window.adobeDataLayer is active";
-      badge.textContent = "📊 AEP DataLayer";
+      badge.title = "Adobe DataLayer Debug Mode — window.adobeDataLayer is active. Click to see history in console.";
+      badge.style.cursor = "pointer";
+      badge.textContent = "📊 AEP DataLayer (" + count + ")";
+      badge.addEventListener("click", function () {
+        console.group("%c[NexaBank DataLayer] Full Event History (" + window.adobeDataLayer.length + " events)", "color:#c8960c;font-weight:bold;font-size:13px;");
+        window.adobeDataLayer.forEach(function (evt, i) {
+          console.log("%c[" + i + "] " + evt.event + " @ " + (evt._ts || ""), "color:#57606a;font-size:11px;", evt);
+        });
+        console.log("%cTip: NexaBankDL.clearHistory() resets the history for a fresh demo.", "color:#3b82d4;font-style:italic;");
+        console.groupEnd();
+        // update count in badge
+        badge.textContent = "📊 AEP DataLayer (" + window.adobeDataLayer.length + ")";
+      });
+
+      // Update count whenever new events arrive (poll every 500ms)
+      setInterval(function () {
+        badge.textContent = "📊 AEP DataLayer (" + window.adobeDataLayer.length + ")";
+      }, 500);
+
       document.body.appendChild(badge);
     });
   }
