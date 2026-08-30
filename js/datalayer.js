@@ -116,59 +116,119 @@
     }
   }
 
-  // ─── Adobe Data Layer — persistent across page navigations ───────────────
-  // Events are written to localStorage under "nexaBankDL_events" so the full
-  // history survives page redirects (login → dashboard, etc.).
-  // The in-memory window.adobeDataLayer is rehydrated from storage on every
-  // page load, making it always cumulative for DevTools inspection.
-  var DL_STORAGE_KEY     = "nexaBankDL_events";
-  var DL_MAX_EVENTS      = 200;   // cap to prevent unbounded storage growth
-
-  // ── Page-load deduplication ──────────────────────────────────────────────
-  // A page-scoped event (pageView, productImpression) must fire exactly once
-  // per page load — never duplicated when navigating back to the same page.
+  // ─── Adobe Data Layer — storage model ────────────────────────────────────
   //
-  // Each execution of datalayer.js IS one page load (scripts re-run on every
-  // full navigation). So we simply generate a fresh _loadID every time this
-  // script runs. The dedup check then looks for this ID in the persisted
-  // history — it will never exist because it was just created — so the event
-  // fires exactly once, then gets written to localStorage under this _loadID.
-  // On the next load a new _loadID is created and the cycle repeats cleanly.
+  // BEHAVIOUR:
+  //   • On REFRESH  — page-scoped events (pageView, productListViews) for the
+  //     current page REPLACE their previous entry. No duplicates build up.
+  //   • On REDIRECT — all events from prior pages PERSIST. The new page's
+  //     events are appended after them.
+  //   • Interaction events (login, form, CTA, calculator…) are always appended
+  //     and never replaced — each user action is a distinct occurrence.
+  //
+  // STORAGE STRUCTURE  (localStorage key: "nexaBankDL_store")
+  //   {
+  //     pages: {
+  //       "<pageKey>": {
+  //         order: <integer>,   // visit sequence, used for chronological sort
+  //         pageScoped: [...],  // pageView + productListViews — replaced on refresh
+  //         interactions: [...] // form/login/CTA events — always appended
+  //       },
+  //       ...
+  //     }
+  //   }
+  //
+  // window.adobeDataLayer is built by flattening all pages in visit order,
+  // interleaving pageScoped then interactions for each page.
+  // ─────────────────────────────────────────────────────────────────────────
 
-  var _loadID = "PL-" + Date.now() + "-" + Math.random().toString(36).substr(2, 6);
+  var DL_STORE_KEY = "nexaBankDL_store";
 
-  function _loadFromStorage() {
+  // Identify the current page — use the filename (e.g. "index.html").
+  var _pageKey = (window.location.pathname.split("/").pop() || "index.html")
+                  + (window.location.search || "");
+
+  // ── Storage helpers ───────────────────────────────────────────────────────
+  function _loadStore() {
     try {
-      var raw = localStorage.getItem(DL_STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
+      var raw = localStorage.getItem(DL_STORE_KEY);
+      return (raw ? JSON.parse(raw) : null) || { pages: {} };
     } catch (e) {
-      return [];
+      return { pages: {} };
     }
   }
 
-  function _saveToStorage(arr) {
-    try {
-      var trimmed = arr.length > DL_MAX_EVENTS ? arr.slice(-DL_MAX_EVENTS) : arr;
-      localStorage.setItem(DL_STORAGE_KEY, JSON.stringify(trimmed));
-    } catch (e) {}
+  function _saveStore(store) {
+    try { localStorage.setItem(DL_STORE_KEY, JSON.stringify(store)); } catch (e) {}
   }
 
-  // Rehydrate: seed window.adobeDataLayer with the persisted history.
-  window.adobeDataLayer = _loadFromStorage();
+  // ── Bootstrap the store for this page load ───────────────────────────────
+  var _store = _loadStore();
 
-  // Wrap push() on this specific instance to write-through to localStorage.
+  if (!_store.pages[_pageKey]) {
+    // First-ever visit to this page — create its slot with the next order index
+    var _maxOrder = 0;
+    Object.keys(_store.pages).forEach(function (k) {
+      if (_store.pages[k].order > _maxOrder) _maxOrder = _store.pages[k].order;
+    });
+    _store.pages[_pageKey] = { order: _maxOrder + 1, pageScoped: [], interactions: [] };
+  } else {
+    // Refresh of an already-visited page — clear its pageScoped events so
+    // they are replaced (not duplicated) by the fresh page-load events below.
+    _store.pages[_pageKey].pageScoped = [];
+  }
+  // Persist immediately so the cleared pageScoped is in sync.
+  _saveStore(_store);
+
+  // ── Flatten store → window.adobeDataLayer ────────────────────────────────
+  // Sort pages by visit order and interleave [pageScoped, interactions].
+  function _buildDataLayer() {
+    var pages = _store.pages;
+    var keys  = Object.keys(pages).sort(function (a, b) {
+      return pages[a].order - pages[b].order;
+    });
+    var flat = [];
+    keys.forEach(function (k) {
+      (pages[k].pageScoped   || []).forEach(function (e) { flat.push(e); });
+      (pages[k].interactions || []).forEach(function (e) { flat.push(e); });
+    });
+    return flat;
+  }
+
+  // ── Wrap window.adobeDataLayer ────────────────────────────────────────────
+  // Initial population from persisted history.
+  window.adobeDataLayer = _buildDataLayer();
+
   var _originalPush = Array.prototype.push;
+
+  // Override push so callers never need to know about the storage model.
+  // Each entry carries a _scope: "pageScoped" | "interaction" flag set by pushEvent().
   window.adobeDataLayer.push = function () {
     var result = _originalPush.apply(this, arguments);
-    _saveToStorage(this);
+    // The last pushed entry was just added to the live array by _originalPush.
+    // We also need to route it to the correct store bucket.
+    for (var i = 0; i < arguments.length; i++) {
+      var entry = arguments[i];
+      if (entry && typeof entry === "object" && entry.event) {
+        var bucket = (entry._scope === "pageScoped") ? "pageScoped" : "interactions";
+        _store.pages[_pageKey][bucket].push(entry);
+      }
+    }
+    _saveStore(_store);
     return result;
   };
 
-  function pushEvent(eventName, payload) {
-    // _loadID is unique per page load — stamped on every event so you can
-    // group events by page in DevTools: adobeDataLayer.filter(e => e._loadID === "...")
+  // ── pushEvent ─────────────────────────────────────────────────────────────
+  // scope = "pageScoped"   → replaces on refresh  (pageView, productListViews)
+  // scope = "interaction"  → always appends        (login, form, CTA, etc.)
+  function pushEvent(eventName, payload, scope) {
     var entry = Object.assign(
-      { event: eventName, _ts: new Date().toISOString(), _loadID: _loadID },
+      {
+        event:   eventName,
+        _ts:     new Date().toISOString(),
+        _page:   _pageKey,
+        _scope:  scope || "interaction",
+      },
       payload
     );
     window.adobeDataLayer.push(entry);
@@ -206,13 +266,13 @@
       pageType:        pageData.pageType        || "informational",
     };
 
-    // pageScoped=true: only fires once per page load, never duplicated on reload
+    // "pageScoped" → replaced on refresh, persisted on redirect
     pushEvent("web.webpagedetails.pageViews", {
       pageName:     xdm.web.webPageDetails.name,
       pageURL:      xdm.web.webPageDetails.URL,
       pageCategory: xdm._nexabank.page.pageCategory,
       xdm: xdm,
-    }, true);
+    }, "pageScoped");
 
     sendToAEP(xdm);
   };
@@ -404,11 +464,11 @@
       };
     });
 
-    // pageScoped=true: only fires once per page load, never duplicated on reload
+    // "pageScoped" → replaced on refresh, persisted on redirect
     pushEvent("commerce.productListViews", {
       products: xdm.productListItems,
       xdm: xdm,
-    }, true);
+    }, "pageScoped");
 
     sendToAEP(xdm);
   };
@@ -666,7 +726,8 @@
 
   // ─── clearHistory() — public utility ─────────────────────────────────────
   NexaBankDL.clearHistory = function () {
-    try { localStorage.removeItem(DL_STORAGE_KEY); } catch (e) {}
+    try { localStorage.removeItem(DL_STORE_KEY); } catch (e) {}
+    _store = { pages: {} };
     window.adobeDataLayer.length = 0;
     log("clearHistory", { message: "Event history cleared. window.adobeDataLayer is now empty." });
   };
