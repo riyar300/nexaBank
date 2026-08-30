@@ -503,13 +503,15 @@
 
     if (current === 2) buildReviewSummary();
 
-    // ── DataLayer: step complete ────────────────────────────────────
+    // ── DataLayer: step complete (with field capture) ───────────────
     if (window.NexaBankDL) {
+      var stepForm = document.getElementById("step" + current);
       window.NexaBankDL.cardApplicationStep({
         formID:     cardAppFormID,
         step:       STEP_NAMES[current] || ("step" + current),
         stepNumber: current,
         cardType:   (document.getElementById("appCardType") || {}).value || "",
+        formFields: window.NexaBankDL.collectFormFields(stepForm),
       });
     }
 
@@ -580,13 +582,21 @@
     document.getElementById("stepSuccess").classList.add("active");
     document.getElementById("appRefNumber").textContent = ref;
 
-    // ── DataLayer: application complete ────────────────────────────
+    // ── DataLayer: application complete (full form capture) ────────
     if (window.NexaBankDL) {
+      // Collect all steps: step1 + step2 fields in one merged object
+      var allFields = window.NexaBankDL.collectFormFields(
+        document.getElementById("step1"),
+        window.NexaBankDL.collectFormFields(document.getElementById("step2"), {
+          referenceNo: ref,
+        })
+      );
       window.NexaBankDL.cardApplicationComplete({
         formID:         cardAppFormID,
         cardType:       cardType,
         referenceNo:    ref,
         applicantEmail: emailVal,
+        formFields:     allFields,
       });
     }
 

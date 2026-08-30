@@ -339,6 +339,7 @@
         formName: "Contact Us Enquiry",
         formType: "enquiry",
         enquiryCategory: category ? category.value : "general",
+        formFields: window.NexaBankDL.collectFormFields(form),
       });
       showContactSuccess(form);
     });

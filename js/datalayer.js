@@ -243,9 +243,66 @@
    */
 
   // ═══════════════════════════════════════════════════════════════════════════
+  // FIELD CAPTURE HELPER
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  // Fields whose values must never appear in the datalayer.
+  var SENSITIVE_FIELDS = ["password", "passwd", "pwd", "cvv", "cvc", "pin"];
+
+  /**
+   * _scrubFields(rawFields)
+   * Accepts a plain object of { fieldName: value } pairs.
+   * Redacts any key that matches SENSITIVE_FIELDS.
+   * Trims all string values. Leaves numbers/booleans as-is.
+   */
+  function _scrubFields(raw) {
+    var safe = {};
+    Object.keys(raw).forEach(function (key) {
+      var isSensitive = SENSITIVE_FIELDS.some(function (s) {
+        return key.toLowerCase().indexOf(s) !== -1;
+      });
+      safe[key] = isSensitive ? "***REDACTED***" : raw[key];
+    });
+    return safe;
+  }
+
+  /**
+   * NexaBankDL.collectFormFields(formEl, extraFields)
+   * Public utility — reads all named inputs/selects/textareas in a <form>
+   * element and returns a scrubbed { fieldName: value } object.
+   *
+   * @param {HTMLFormElement} formEl   — the form DOM element
+   * @param {object}          extraFields — any additional key/value pairs to merge in
+   * @returns {object}  scrubbed field map, safe to push to the datalayer
+   *
+   * Usage:
+   *   var fields = NexaBankDL.collectFormFields(document.getElementById("contactForm"));
+   */
+
+  // ═══════════════════════════════════════════════════════════════════════════
   // PUBLIC API
   // ═══════════════════════════════════════════════════════════════════════════
   var NexaBankDL = {};
+
+  NexaBankDL.collectFormFields = function (formEl, extraFields) {
+    var raw = {};
+    if (formEl) {
+      var els = formEl.querySelectorAll("input[name], select[name], textarea[name]");
+      els.forEach(function (el) {
+        if (el.type === "checkbox") {
+          raw[el.name] = el.checked;
+        } else if (el.type === "radio") {
+          if (el.checked) raw[el.name] = el.value;
+        } else {
+          raw[el.name] = (typeof el.value === "string") ? el.value.trim() : el.value;
+        }
+      });
+    }
+    if (extraFields && typeof extraFields === "object") {
+      Object.keys(extraFields).forEach(function (k) { raw[k] = extraFields[k]; });
+    }
+    return _scrubFields(raw);
+  };
 
   /**
    * PAGE VIEW
@@ -324,6 +381,8 @@
       type:  formData.formType || "enquiry",
       step:  "complete",
     };
+    // formFields: scrubbed key/value map of what the user filled in
+    var fields = formData.formFields ? _scrubFields(formData.formFields) : {};
     xdm._nexabank.form = {
       formID:            xdm.web.webFormFilledOut.ID,
       formName:          xdm.web.webFormFilledOut.name,
@@ -331,6 +390,7 @@
       formStep:          "complete",
       formSubmitSuccess: true,
       enquiryCategory:   formData.enquiryCategory || "",
+      formFields:        fields,
     };
 
     pushEvent("web.formFilledOut", {
@@ -338,6 +398,7 @@
       formID:          xdm._nexabank.form.formID,
       formStep:        "complete",
       enquiryCategory: xdm._nexabank.form.enquiryCategory,
+      formFields:      fields,
       xdm: xdm,
     });
 
@@ -619,6 +680,8 @@
       type: "calculator",
       step: data.step || "start",
     };
+    // formFields: all calculator inputs + result, safe to store
+    var fields = _scrubFields(Object.assign({}, data.inputs || {}, data.result || {}));
     xdm._nexabank.calculator = {
       calculatorType:  data.calculatorType  || "",
       calculatorStep:  data.step            || "start",
@@ -628,6 +691,7 @@
       interestRate:    data.inputs && data.inputs.rate             || null,
       emailCaptured:   data.inputs && !!data.inputs.email,
       monthlyPayment:  data.result && data.result.monthlyPayment   || null,
+      formFields:      fields,
     };
 
     pushEvent("nexabank.calculator." + (data.step || "start"), {
@@ -635,6 +699,7 @@
       step:           xdm._nexabank.calculator.calculatorStep,
       inputs:         data.inputs  || {},
       result:         data.result  || {},
+      formFields:     fields,
       xdm: xdm,
     });
 
@@ -670,12 +735,15 @@
       type: "application",
       step: data.step       || "start",
     };
+    // formFields: whatever the caller passes in (already scrubbed at call site)
+    var fields = data.formFields ? _scrubFields(data.formFields) : {};
     xdm._nexabank.cardApplication = {
       formID:       xdm.web.webFormFilledOut.ID,
       stepName:     data.step        || "start",
       stepNumber:   data.stepNumber  || 0,
       cardType:     data.cardType    || "",
       errorFields:  data.errorFields || [],
+      formFields:   fields,
     };
 
     pushEvent("nexabank.cardApplication." + (data.step || "start"), {
@@ -683,6 +751,7 @@
       stepName:   xdm._nexabank.cardApplication.stepName,
       stepNumber: xdm._nexabank.cardApplication.stepNumber,
       cardType:   xdm._nexabank.cardApplication.cardType,
+      formFields: fields,
       xdm: xdm,
     });
 
@@ -704,13 +773,15 @@
       type: "application",
       step: "complete",
     };
+    var fields = data.formFields ? _scrubFields(data.formFields) : {};
     xdm._nexabank.cardApplication = {
-      formID:        xdm.web.webFormFilledOut.ID,
-      stepName:      "complete",
-      stepNumber:    3,
-      cardType:      data.cardType      || "",
-      referenceNo:   data.referenceNo   || "",
+      formID:         xdm.web.webFormFilledOut.ID,
+      stepName:       "complete",
+      stepNumber:     3,
+      cardType:       data.cardType       || "",
+      referenceNo:    data.referenceNo    || "",
       applicantEmail: data.applicantEmail || "",
+      formFields:     fields,
     };
 
     pushEvent("nexabank.cardApplication.complete", {
@@ -718,6 +789,7 @@
       cardType:       xdm._nexabank.cardApplication.cardType,
       referenceNo:    xdm._nexabank.cardApplication.referenceNo,
       applicantEmail: xdm._nexabank.cardApplication.applicantEmail,
+      formFields:     fields,
       xdm: xdm,
     });
 
