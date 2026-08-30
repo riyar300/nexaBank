@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" width="200" height="60">
+  <!-- NexaBank SVG Logo -->
+  <!-- Icon: golden "N" square -->
+  <rect x="0" y="8" width="44" height="44" rx="8" fill="#f5a623"/>
+  <text x="22" y="37" font-family="-apple-system,Segoe UI,system-ui,sans-serif" font-size="24" font-weight="800" fill="#1a1a2e" text-anchor="middle" dominant-baseline="middle">N</text>
+  <!-- Wordmark -->
+  <text x="54" y="30" font-family="-apple-system,Segoe UI,system-ui,sans-serif" font-size="22" font-weight="800" fill="#1a1a2e">NexaBank</text>
+  <text x="55" y="46" font-family="-apple-system,Segoe UI,system-ui,sans-serif" font-size="9" font-weight="500" fill="#57606a" letter-spacing="0.5">DIGITAL BANKING</text>
+</svg>

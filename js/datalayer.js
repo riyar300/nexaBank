@@ -75,11 +75,13 @@
   // ─── Helpers ──────────────────────────────────────────────────────────────
   function getSiteSection() {
     var path = window.location.pathname;
-    if (path.includes("contact"))           return "Contact Us";
-    if (path.includes("login"))             return "Login";
-    if (path.includes("savings"))           return "Savings & Deposits";
-    if (path.includes("credit-cards"))      return "Credit Cards";
-    if (path.includes("home-financing"))    return "Home Financing";
+    if (path.includes("contact"))            return "Contact Us";
+    if (path.includes("login"))              return "Login";
+    if (path.includes("dashboard"))          return "Dashboard";
+    if (path.includes("card-application"))   return "Card Application";
+    if (path.includes("savings"))            return "Savings & Deposits";
+    if (path.includes("credit-cards"))       return "Credit Cards";
+    if (path.includes("home-financing"))     return "Home Financing";
     if (path.includes("personal-financing")) return "Personal Financing";
     if (path === "/" || path.includes("index")) return "Home";
     return "Other";
@@ -353,6 +355,268 @@
 
     sendToAEP(xdm);
   };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * USER LOGIN — ATTEMPT
+   * XDM eventType: web.formFilledOut  (login form submitted with credentials)
+   * Fire immediately when the user clicks "Secure Login" (before credential check).
+   */
+  NexaBankDL.loginAttempt = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "Online Banking Login",
+      ID:   data.formID || generateInteractionId(),
+      type: "authentication",
+      step: "attempt",
+    };
+    xdm._nexabank.authentication = {
+      event:    "loginAttempt",
+      username: data.username || "",
+      method:   "usernamePassword",
+    };
+
+    pushEvent("nexabank.user.loginAttempt", {
+      username: xdm._nexabank.authentication.username,
+      method:   xdm._nexabank.authentication.method,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  /**
+   * USER LOGIN — SUCCESS
+   * XDM eventType: web.formFilledOut  (credentials validated, session created)
+   * Fire after successful credential validation.
+   */
+  NexaBankDL.loginSuccess = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "Online Banking Login",
+      ID:   data.formID || generateInteractionId(),
+      type: "authentication",
+      step: "complete",
+    };
+    xdm._nexabank.authentication = {
+      event:       "loginSuccess",
+      username:    data.username || "",
+      method:      "usernamePassword",
+      sessionStart: new Date().toISOString(),
+    };
+
+    pushEvent("nexabank.user.loginSuccess", {
+      username:     xdm._nexabank.authentication.username,
+      sessionStart: xdm._nexabank.authentication.sessionStart,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  /**
+   * USER LOGIN — FAILURE
+   * XDM eventType: web.formFilledOut  (invalid credentials or validation error)
+   * Fire when login fails for any reason.
+   */
+  NexaBankDL.loginFailure = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "Online Banking Login",
+      ID:   data.formID || generateInteractionId(),
+      type: "authentication",
+      step: "error",
+    };
+    xdm._nexabank.authentication = {
+      event:        "loginFailure",
+      username:     data.username      || "",
+      method:       "usernamePassword",
+      failureReason: data.reason       || "invalid_credentials",
+    };
+
+    pushEvent("nexabank.user.loginFailure", {
+      username:      xdm._nexabank.authentication.username,
+      failureReason: xdm._nexabank.authentication.failureReason,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  /**
+   * USER LOGOUT
+   * XDM eventType: web.webinteraction.linkClicks  (user-initiated sign-out action)
+   * Fire when the user clicks Sign Out.
+   */
+  NexaBankDL.userLogout = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.webinteraction.linkClicks");
+    xdm.web.webInteraction = {
+      name:       "Sign Out",
+      URL:        window.location.href,
+      linkType:   "other",
+      linkClicks: { value: 1 },
+    };
+    xdm._nexabank.authentication = {
+      event:      "logout",
+      username:   data.username || (sessionStorage.getItem("nexaUser") || ""),
+      logoutTime: new Date().toISOString(),
+    };
+
+    pushEvent("nexabank.user.logout", {
+      username:   xdm._nexabank.authentication.username,
+      logoutTime: xdm._nexabank.authentication.logoutTime,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * CALCULATOR INTERACTION
+   * XDM eventType: web.formFilledOut
+   * Covers all steps of a financing calculator:
+   *   step = "start"      — user opens / first touches the calculator
+   *   step = "next"       — user advances past the input step
+   *   step = "emailGate"  — user lands on the email capture step
+   *   step = "complete"   — user receives the calculated result
+   *
+   * @param {object} data
+   *   calculatorType : "Home Financing" | "Personal Financing"
+   *   step           : "start" | "next" | "emailGate" | "complete"
+   *   inputs         : { loanAmount, tenure, rate, downPayment, email }
+   *   result         : { monthlyPayment }   (only on "complete")
+   */
+  NexaBankDL.calculatorInteraction = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: (data.calculatorType || "Financing") + " Calculator",
+      ID:   data.calculatorID || generateInteractionId(),
+      type: "calculator",
+      step: data.step || "start",
+    };
+    xdm._nexabank.calculator = {
+      calculatorType:  data.calculatorType  || "",
+      calculatorStep:  data.step            || "start",
+      loanAmount:      data.inputs && data.inputs.loanAmount      || null,
+      downPayment:     data.inputs && data.inputs.downPayment      || null,
+      tenure:          data.inputs && data.inputs.tenure           || null,
+      interestRate:    data.inputs && data.inputs.rate             || null,
+      emailCaptured:   data.inputs && !!data.inputs.email,
+      monthlyPayment:  data.result && data.result.monthlyPayment   || null,
+    };
+
+    pushEvent("nexabank.calculator." + (data.step || "start"), {
+      calculatorType: xdm._nexabank.calculator.calculatorType,
+      step:           xdm._nexabank.calculator.calculatorStep,
+      inputs:         data.inputs  || {},
+      result:         data.result  || {},
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * CARD APPLICATION — STEP
+   * XDM eventType: web.formFilledOut
+   * Fire on every step transition in the credit card application:
+   *   step = "start"         — page load / first field interaction
+   *   step = "personal-info" — Step 1 completed → moving to Step 2
+   *   step = "employment"    — Step 2 completed → moving to Step 3
+   *   step = "review"        — Step 3 review screen reached
+   *   step = "complete"      — Form successfully submitted
+   *   step = "error"         — Validation failure on any step
+   *
+   * @param {object} data
+   *   formID       : persistent ID across all steps
+   *   step         : one of the step strings above
+   *   stepNumber   : 1 | 2 | 3
+   *   cardType     : "cashback" | "platinum" | "gold-i"
+   *   errorFields  : [] (only on "error")
+   */
+  NexaBankDL.cardApplicationStep = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "Credit Card Application",
+      ID:   data.formID     || generateInteractionId(),
+      type: "application",
+      step: data.step       || "start",
+    };
+    xdm._nexabank.cardApplication = {
+      formID:       xdm.web.webFormFilledOut.ID,
+      stepName:     data.step        || "start",
+      stepNumber:   data.stepNumber  || 0,
+      cardType:     data.cardType    || "",
+      errorFields:  data.errorFields || [],
+    };
+
+    pushEvent("nexabank.cardApplication." + (data.step || "start"), {
+      formID:     xdm._nexabank.cardApplication.formID,
+      stepName:   xdm._nexabank.cardApplication.stepName,
+      stepNumber: xdm._nexabank.cardApplication.stepNumber,
+      cardType:   xdm._nexabank.cardApplication.cardType,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+    return xdm.web.webFormFilledOut.ID;
+  };
+
+  /**
+   * CARD APPLICATION — COMPLETE
+   * XDM eventType: web.formFilledOut (step = "complete")
+   * Fire when the application is successfully submitted.
+   */
+  NexaBankDL.cardApplicationComplete = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "Credit Card Application",
+      ID:   data.formID  || generateInteractionId(),
+      type: "application",
+      step: "complete",
+    };
+    xdm._nexabank.cardApplication = {
+      formID:        xdm.web.webFormFilledOut.ID,
+      stepName:      "complete",
+      stepNumber:    3,
+      cardType:      data.cardType      || "",
+      referenceNo:   data.referenceNo   || "",
+      applicantEmail: data.applicantEmail || "",
+    };
+
+    pushEvent("nexabank.cardApplication.complete", {
+      formID:         xdm._nexabank.cardApplication.formID,
+      cardType:       xdm._nexabank.cardApplication.cardType,
+      referenceNo:    xdm._nexabank.cardApplication.referenceNo,
+      applicantEmail: xdm._nexabank.cardApplication.applicantEmail,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
+  // ─── Debug badge (visible in browser when debugMode = true) ───────────────
+  if (CONFIG.debugMode) {
+    document.addEventListener("DOMContentLoaded", function () {
+      var badge = document.createElement("div");
+      badge.id = "dl-debug-badge";
+      badge.title = "Adobe DataLayer Debug Mode — window.adobeDataLayer is active";
+      badge.textContent = "📊 AEP DataLayer";
+      document.body.appendChild(badge);
+    });
+  }
 
   // Expose
   window.NexaBankDL = NexaBankDL;

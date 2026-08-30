@@ -143,7 +143,7 @@ input, select, textarea { font-family: var(--font); }
 }
 .nav-item.has-dropdown:hover .dropdown-menu { display: block; }
 
-.header-actions { display: flex; align-items: center; gap: 10px; }
+.header-actions { display: flex; align-items: center; gap: 10px; margin-left: 24px; }
 .btn-header-login {
   background: var(--primary);
   color: var(--secondary);
@@ -901,4 +901,85 @@ input, select, textarea { font-family: var(--font); }
   .footer-grid { grid-template-columns: 1fr; }
   .hero-title { font-size: 24px; }
   .stats-grid { grid-template-columns: 1fr 1fr; }
+  .products-grid { grid-template-columns: 1fr; }
+  .channel-cards { grid-template-columns: 1fr; }
+  .products-grid[style*="repeat(3"] { grid-template-columns: 1fr !important; }
+}
+
+/* ─── Smooth scroll offset for sticky header ─────────────────── */
+[id] { scroll-margin-top: 80px; }
+
+/* ─── btn-outline on dark backgrounds ───────────────────────── */
+.dark-bg .btn-outline,
+.app-banner .btn-outline {
+  color: var(--white);
+  border-color: rgba(255,255,255,.5);
+}
+.dark-bg .btn-outline:hover,
+.app-banner .btn-outline:hover {
+  background: rgba(255,255,255,.1);
+  border-color: var(--white);
+}
+
+/* ─── Calculator section polish ────────────────────────────────── */
+.calc-container {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 32px;
+  margin-top: 8px;
+}
+
+/* ─── DataLayer debug badge (shown only when debugMode=true) ──── */
+#dl-debug-badge {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  background: var(--secondary);
+  color: var(--primary);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 20px;
+  z-index: 9999;
+  box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  pointer-events: none;
+  opacity: .85;
+}
+
+/* ─── Skip to content link (accessibility) ──────────────────── */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary);
+  color: var(--secondary);
+  font-weight: 700;
+  padding: 8px 14px;
+  z-index: 9999;
+  border-radius: 0 0 var(--radius) 0;
+  transition: top .2s;
+}
+.skip-link:focus { top: 0; }
+
+/* ─── Focus visible style ────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Input number spinners hidden ──────────────────────────── */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { -moz-appearance: textfield; }
+
+/* ─── Print styles ───────────────────────────────────────────── */
+@media print {
+  .top-bar, .site-header, .promo-ticker, .app-banner,
+  .mobile-menu-toggle, .btn-header-login, .btn-login,
+  .btn-submit, .btn-primary, .btn-card { display: none !important; }
+  body { font-size: 12pt; color: #000; }
+  .site-footer { background: #fff; color: #000; }
 }

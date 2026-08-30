@@ -125,20 +125,26 @@
     // Form Submit
     form.addEventListener("submit", function (e) {
       e.preventDefault();
-      var username = form.querySelector("#username");
-      var password = form.querySelector("#password");
+      var usernameEl = form.querySelector("#username");
+      var passwordEl = form.querySelector("#password");
       var errors = [];
 
-      if (!username || !username.value.trim()) errors.push("username");
-      if (!password || !password.value.trim()) errors.push("password");
+      if (!usernameEl || !usernameEl.value.trim()) errors.push("username");
+      if (!passwordEl || !passwordEl.value.trim()) errors.push("password");
 
       if (errors.length > 0) {
+        // ── Empty-field validation failure ────────────────────────
+        window.NexaBankDL.loginFailure({
+          formID:  formID,
+          username: usernameEl ? usernameEl.value.trim() : "",
+          reason:   "empty_fields",
+        });
         window.NexaBankDL.formError({
-          formID: formID,
-          formName: "Online Banking Login",
-          formType: "authentication",
-          formStep: "submit",
-          errorFields: errors,
+          formID:        formID,
+          formName:      "Online Banking Login",
+          formType:      "authentication",
+          formStep:      "submit",
+          errorFields:   errors,
           errorMessages: errors.map(function (f) {
             return f.charAt(0).toUpperCase() + f.slice(1) + " is required";
           }),
@@ -147,15 +153,66 @@
         return;
       }
 
+      var VALID_CREDENTIALS = { "rroy1": "1234" };
+      var enteredUser = usernameEl.value.trim();
+      var enteredPass = passwordEl.value.trim();
+
+      // ── Push login attempt before credential check ────────────
+      window.NexaBankDL.loginAttempt({
+        formID:   formID,
+        username: enteredUser,
+      });
+
+      if (!VALID_CREDENTIALS[enteredUser] || VALID_CREDENTIALS[enteredUser] !== enteredPass) {
+        // ── Invalid credentials ───────────────────────────────────
+        window.NexaBankDL.loginFailure({
+          formID:  formID,
+          username: enteredUser,
+          reason:   "invalid_credentials",
+        });
+        window.NexaBankDL.formError({
+          formID:        formID,
+          formName:      "Online Banking Login",
+          formType:      "authentication",
+          formStep:      "submit",
+          errorFields:   ["credentials"],
+          errorMessages: ["Invalid username or password"],
+        });
+        showCredentialError(form);
+        return;
+      }
+
+      // ── Valid login ───────────────────────────────────────────
+      window.NexaBankDL.loginSuccess({
+        formID:   formID,
+        username: enteredUser,
+      });
       window.NexaBankDL.formSubmit({
-        formID: formID,
-        formName: "Online Banking Login",
-        formType: "authentication",
+        formID:          formID,
+        formName:        "Online Banking Login",
+        formType:        "authentication",
         enquiryCategory: "login",
       });
 
-      showLoginSuccess(form);
+      sessionStorage.setItem("nexaUser", enteredUser);
+      showLoginSuccess(form, enteredUser);
     });
+  }
+
+  function showCredentialError(form) {
+    var existing = form.querySelector(".credentials-error");
+    if (!existing) {
+      var errDiv = document.createElement("div");
+      errDiv.className = "credentials-error field-error";
+      errDiv.style.marginTop = "10px";
+      errDiv.style.textAlign = "center";
+      errDiv.textContent = "Invalid username or password. Please try again.";
+      form.querySelector(".btn-login").parentNode.insertBefore(errDiv, form.querySelector(".btn-login"));
+    }
+    var usernameEl = form.querySelector("#username");
+    var passwordEl = form.querySelector("#password");
+    if (usernameEl) usernameEl.classList.add("input-error");
+    if (passwordEl) passwordEl.classList.add("input-error");
   }
 
   function showFormError(form, errorFields) {
@@ -183,18 +240,19 @@
     });
   }
 
-  function showLoginSuccess(form) {
+  function showLoginSuccess(form, username) {
     var btn = form.querySelector(".btn-login");
     if (btn) {
       btn.textContent = "Logging in…";
       btn.disabled = true;
     }
+    // Remove any credential error
+    var credErr = form.querySelector(".credentials-error");
+    if (credErr) credErr.remove();
+
     setTimeout(function () {
-      if (btn) {
-        btn.textContent = "Secure Login";
-        btn.disabled = false;
-      }
-    }, 2000);
+      window.location.href = "dashboard.html";
+    }, 800);
   }
 
   // ─── DataLayer: Navigation wiring ─────────────────────────────────────────

@@ -241,5 +241,17 @@
 
 <script src="js/datalayer.js"></script>
 <script src="js/main.js"></script>
+<script>
+  // ── Product Impression – Savings & Deposits page ──────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.NexaBankDL) {
+      window.NexaBankDL.productImpression([
+        { productID: "NB-SAV-001", productName: "NexaSave-i Account",      productCategory: "Deposits", productSubCategory: "Islamic Savings Account" },
+        { productID: "NB-SAV-002", productName: "NexaSave Fixed Deposit",  productCategory: "Deposits", productSubCategory: "Fixed Deposit"           },
+        { productID: "NB-SAV-003", productName: "NexaYouth Savings",       productCategory: "Deposits", productSubCategory: "Youth Savings Account"   },
+      ]);
+    }
+  });
+</script>
 </body>
 </html>

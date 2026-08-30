@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="NexaBank – Your trusted digital banking partner. Secure online banking, savings, loans and more." />
+  <!-- Open Graph / Social -->
+  <meta property="og:type"        content="website" />
+  <meta property="og:title"       content="NexaBank | Home – Secure Digital Banking" />
+  <meta property="og:description" content="Malaysia's most trusted digital bank. Savings, financing, credit cards and more — all in one place." />
+  <meta property="og:image"       content="images/nexabank-og.svg" />
+  <meta property="og:url"         content="https://nexabank.demo/" />
+  <meta name="theme-color"        content="#f5a623" />
   <!-- AEP Datalayer page metadata -->
   <meta name="page-data" content='{
     "pageName": "NexaBank | Home",
@@ -518,7 +525,19 @@
 <script src="js/datalayer.js"></script>
 <script src="js/main.js"></script>
 <script>
-  // Accordion (if present)
+  // ── Product Impression – fire on page load ────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.NexaBankDL) {
+      window.NexaBankDL.productImpression([
+        { productID: "NB-SAV-001", productName: "Savings & Deposits",  productCategory: "Deposits",          productSubCategory: "Savings Account" },
+        { productID: "NB-CC-001",  productName: "Credit Cards",        productCategory: "Credit Cards",      productSubCategory: "Cashback Card"    },
+        { productID: "NB-HF-001",  productName: "Home Financing",      productCategory: "Loans & Financing", productSubCategory: "Home Loan"        },
+        { productID: "NB-PF-001",  productName: "Personal Financing",  productCategory: "Loans & Financing", productSubCategory: "Personal Loan"    },
+      ]);
+    }
+  });
+
+  // ── Accordion ─────────────────────────────────────────────────────────────
   document.querySelectorAll(".accordion-header").forEach(function (btn) {
     btn.addEventListener("click", function () {
       var body = btn.nextElementSibling;

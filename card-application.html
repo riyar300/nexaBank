@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Apply for a NexaBank Credit Card – Fast, simple, secure online application." />
+  <meta name="page-data" content='{
+    "pageName": "NexaBank | Credit Card Application",
+    "pageCategory": "Personal",
+    "pageSubCategory": "Credit Cards",
+    "pageType": "application",
+    "pageLanguage": "en"
+  }' />
+  <title>Credit Card Application | NexaBank</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .app-layout {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 32px;
+      align-items: flex-start;
+      padding: 52px 0 64px;
+    }
+    .app-form-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 36px 32px;
+      box-shadow: var(--shadow);
+    }
+    .app-form-card h2 { font-size: 22px; font-weight: 800; color: var(--secondary); margin-bottom: 4px; }
+    .app-form-card > p { font-size: 14px; color: var(--text-muted); margin-bottom: 28px; }
+    .form-section-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--text-muted);
+      margin: 24px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .step-bar { display: flex; gap: 0; margin-bottom: 28px; }
+    .step-bar-item { flex: 1; text-align: center; }
+    .step-bar-item .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--border); color: var(--text-muted);
+      font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 5px;
+      transition: background .2s;
+    }
+    .step-bar-item.active .step-dot { background: var(--primary); color: var(--secondary); }
+    .step-bar-item.done .step-dot { background: var(--green); color: #fff; }
+    .step-bar-item .step-label { font-size: 11px; color: var(--text-muted); }
+    .step-bar-item.active .step-label { color: var(--secondary); font-weight: 600; }
+    .step-connector { flex: 0.3; display: flex; align-items: center; padding-bottom: 18px; }
+    .step-connector::after { content: ""; display: block; height: 2px; width: 100%; background: var(--border); }
+    .card-preview-box {
+      background: var(--secondary);
+      border-radius: 12px;
+      padding: 24px;
+      color: var(--white);
+      position: sticky;
+      top: 88px;
+    }
+    .card-preview-box h3 { font-size: 15px; font-weight: 700; margin-bottom: 18px; color: rgba(255,255,255,.7); text-transform: uppercase; letter-spacing: .5px; }
+    .card-visual-preview {
+      border-radius: 10px;
+      padding: 20px 22px;
+      margin-bottom: 20px;
+      position: relative;
+      min-height: 120px;
+    }
+    .card-visual-preview .card-name { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+    .card-visual-preview .card-tagline { font-size: 12px; opacity: .75; }
+    .card-feature-list { list-style: none; }
+    .card-feature-list li { font-size: 13px; color: rgba(255,255,255,.75); padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+    .card-feature-list li:last-child { border: none; }
+    .card-feature-list li::before { content: "✓ "; color: var(--primary); font-weight: 700; }
+    .disclaimer { font-size: 11.5px; color: rgba(255,255,255,.4); margin-top: 14px; line-height: 1.6; }
+    .form-step { display: none; }
+    .form-step.active { display: block; }
+    .success-panel { text-align: center; padding: 40px 20px; }
+    .success-panel .success-icon { font-size: 56px; margin-bottom: 16px; }
+    .success-panel h3 { font-size: 22px; font-weight: 800; color: var(--secondary); margin-bottom: 8px; }
+    .success-panel p { font-size: 14.5px; color: var(--text-muted); max-width: 400px; margin: 0 auto 24px; line-height: 1.7; }
+    .ref-number { display: inline-block; background: var(--surface); border: 1.5px solid var(--border); border-radius: 6px; padding: 8px 20px; font-size: 16px; font-weight: 700; color: var(--secondary); letter-spacing: 1px; margin-bottom: 20px; }
+    @media (max-width: 900px) { .app-layout { grid-template-columns: 1fr; } .card-preview-box { position: static; } }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } .app-form-card { padding: 24px 18px; } }
+  </style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-left"><span>🌐 Malaysia</span></div>
+    <div class="top-bar-right">
+      <a href="contact.html">Help &amp; Support</a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo-wrap" aria-label="NexaBank Home">
+      <div class="logo-icon">N</div>
+      <div class="logo-text"><div class="logo-name">NexaBank</div><div class="logo-tagline">Digital Banking</div></div>
+    </a>
+    <nav class="main-nav" id="mainNav" role="navigation">
+      <div class="nav-item has-dropdown">
+        <a href="#" class="nav-link active" data-nav-section="Personal" data-nav-level="primary">Personal ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="savings-deposits.html">Savings &amp; Deposits</a></li>
+          <li><a href="credit-cards.html">Credit Cards</a></li>
+          <li><a href="home-financing.html">Home Financing</a></li>
+          <li><a href="personal-financing.html">Personal Financing</a></li>
+        </ul>
+      </div>
+      <div class="nav-item">
+        <a href="contact.html" class="nav-link" data-nav-section="Contact" data-nav-level="primary">Contact Us</a>
+      </div>
+    </nav>
+    <div class="header-actions">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu">☰</button>
+      <a href="index.html" class="btn-header-login">Login</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-banner">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html">Home</a><span>›</span>
+      <a href="credit-cards.html">Credit Cards</a><span>›</span>
+      <span>Apply Now</span>
+    </div>
+    <h1>Credit Card Application</h1>
+    <p>Complete your application in under 5 minutes — approval in 3–5 working days</p>
+  </div>
+</div>
+
+<div style="background:var(--white); padding-bottom: 0;">
+  <div class="container">
+    <div class="app-layout">
+
+      <!-- LEFT: Application Form -->
+      <div class="app-form-card">
+
+        <!-- Progress Steps -->
+        <div class="step-bar" id="stepBar">
+          <div class="step-bar-item active" id="stepDot1">
+            <div class="step-dot">1</div>
+            <div class="step-label">Personal Info</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-bar-item" id="stepDot2">
+            <div class="step-dot">2</div>
+            <div class="step-label">Employment</div>
+          </div>
+          <div class="step-connector"></div>
+          <div class="step-bar-item" id="stepDot3">
+            <div class="step-dot">3</div>
+            <div class="step-label">Review</div>
+          </div>
+        </div>
+
+        <h2>Apply for a NexaBank Credit Card</h2>
+        <p>Fill in your details below. All fields marked * are required.</p>
+
+        <!-- ── STEP 1: Personal Info ── -->
+        <div class="form-step active" id="step1">
+          <div class="form-section-title">Personal Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appFullName">Full Name (as per MyKad) *</label>
+              <input type="text" id="appFullName" name="appFullName" placeholder="e.g. Ahmad bin Abdullah" required />
+            </div>
+            <div class="form-group">
+              <label for="appIC">MyKad / NRIC No. *</label>
+              <input type="text" id="appIC" name="appIC" placeholder="e.g. 900101-10-1234" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appDOB">Date of Birth *</label>
+              <input type="date" id="appDOB" name="appDOB" required />
+            </div>
+            <div class="form-group">
+              <label for="appNationality">Nationality *</label>
+              <select id="appNationality" name="appNationality" required>
+                <option value="">Select</option>
+                <option value="MY">Malaysian</option>
+                <option value="PR">Permanent Resident</option>
+                <option value="OTHER">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appEmail">Email Address *</label>
+              <input type="email" id="appEmail" name="appEmail" placeholder="you@example.com" required />
+            </div>
+            <div class="form-group">
+              <label for="appPhone">Mobile Number *</label>
+              <input type="tel" id="appPhone" name="appPhone" placeholder="+60 1X-XXX XXXX" required />
+            </div>
+          </div>
+          <div class="form-row single">
+            <div class="form-group">
+              <label for="appAddress">Residential Address *</label>
+              <input type="text" id="appAddress" name="appAddress" placeholder="Street address" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appCity">City *</label>
+              <input type="text" id="appCity" name="appCity" placeholder="e.g. Kuala Lumpur" required />
+            </div>
+            <div class="form-group">
+              <label for="appPostcode">Postcode *</label>
+              <input type="text" id="appPostcode" name="appPostcode" placeholder="e.g. 50450" required />
+            </div>
+          </div>
+          <div id="step1Error" class="field-error" style="display:none;margin-top:8px;">Please fill in all required fields.</div>
+          <button class="btn-primary" style="width:100%;margin-top:18px;"
+            data-cta-name="card-app-step1-next"
+            data-cta-location="Card Application – Step 1"
+            onclick="nextStep(1)">Continue →</button>
+        </div>
+
+        <!-- ── STEP 2: Employment ── -->
+        <div class="form-step" id="step2">
+          <div class="form-section-title">Employment & Financial Information</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appEmpStatus">Employment Status *</label>
+              <select id="appEmpStatus" name="appEmpStatus" required>
+                <option value="">Select</option>
+                <option value="salaried">Salaried Employee</option>
+                <option value="govt">Government Servant</option>
+                <option value="selfemployed">Self-Employed</option>
+                <option value="retired">Retired</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="appEmployer">Employer / Company Name *</label>
+              <input type="text" id="appEmployer" name="appEmployer" placeholder="e.g. ABC Sdn Bhd" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appIncome">Monthly Gross Income (RM) *</label>
+              <input type="number" id="appIncome" name="appIncome" placeholder="e.g. 5000" required />
+            </div>
+            <div class="form-group">
+              <label for="appCardType">Card Type *</label>
+              <select id="appCardType" name="appCardType" required>
+                <option value="">Select a card</option>
+                <option value="cashback">NexaCard Cashback</option>
+                <option value="platinum">NexaCard Platinum</option>
+                <option value="gold-i">NexaCard Gold-i (Islamic)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="appCreditLimit">Preferred Credit Limit (RM)</label>
+              <select id="appCreditLimit" name="appCreditLimit">
+                <option value="">Bank's discretion</option>
+                <option value="5000">RM 5,000</option>
+                <option value="10000">RM 10,000</option>
+                <option value="20000">RM 20,000</option>
+                <option value="30000">RM 30,000+</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="appExistingCard">Existing NexaBank Relationship</label>
+              <select id="appExistingCard" name="appExistingCard">
+                <option value="no">No existing relationship</option>
+                <option value="savings">Savings Account holder</option>
+                <option value="loan">Existing Loan customer</option>
+              </select>
+            </div>
+          </div>
+          <div id="step2Error" class="field-error" style="display:none;margin-top:8px;">Please fill in all required fields.</div>
+          <div style="display:flex;gap:12px;margin-top:18px;">
+            <button class="btn-outline" style="flex:1;color:var(--secondary);border-color:var(--border);padding:11px;"
+              onclick="prevStep(2)">← Back</button>
+            <button class="btn-primary" style="flex:2;"
+              data-cta-name="card-app-step2-next"
+              data-cta-location="Card Application – Step 2"
+              onclick="nextStep(2)">Review Application →</button>
+          </div>
+        </div>
+
+        <!-- ── STEP 3: Review & Submit ── -->
+        <div class="form-step" id="step3">
+          <div class="form-section-title">Review Your Application</div>
+          <div id="reviewSummary" style="background:var(--surface);border-radius:8px;padding:18px;font-size:13.5px;line-height:2;margin-bottom:18px;"></div>
+          <div class="form-group" style="display:flex;align-items:flex-start;gap:10px;">
+            <input type="checkbox" id="appConsent" style="width:auto;margin-top:4px;flex-shrink:0;" required />
+            <label for="appConsent" style="font-size:13px;color:var(--text-muted);font-weight:400;text-transform:none;letter-spacing:0;">
+              I confirm that all information provided is accurate. I agree to NexaBank's
+              <a href="#" style="color:var(--primary-dk);">Terms &amp; Conditions</a>,
+              <a href="#" style="color:var(--primary-dk);">Privacy Policy</a> and consent to a credit check being conducted.
+            </label>
+          </div>
+          <div id="step3Error" class="field-error" style="display:none;margin-top:8px;">Please accept the terms to proceed.</div>
+          <div style="display:flex;gap:12px;margin-top:18px;">
+            <button class="btn-outline" style="flex:1;color:var(--secondary);border-color:var(--border);padding:11px;"
+              onclick="prevStep(3)">← Back</button>
+            <button class="btn-primary" style="flex:2;"
+              data-cta-name="card-app-submit"
+              data-cta-location="Card Application – Step 3"
+              onclick="submitApplication()">Submit Application</button>
+          </div>
+        </div>
+
+        <!-- ── SUCCESS ── -->
+        <div class="form-step" id="stepSuccess">
+          <div class="success-panel">
+            <div class="success-icon">🎉</div>
+            <h3>Application Submitted!</h3>
+            <p>Thank you for applying for a NexaBank credit card. Your application is under review and you will receive a response within <strong>3–5 working days</strong> via email.</p>
+            <div class="ref-number" id="appRefNumber">NB-CARD-000000</div>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+              <a href="credit-cards.html" class="btn-outline" style="color:var(--secondary);border-color:var(--border);padding:10px 22px;font-size:14px;">← Back to Cards</a>
+              <a href="index.html" class="btn-primary" style="padding:10px 22px;font-size:14px;"
+                data-cta-name="card-app-success-home" data-cta-location="Card Application Success">Return to Home</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Card Preview -->
+      <div class="card-preview-box" id="cardPreviewBox">
+        <h3>Your Selected Card</h3>
+        <div class="card-visual-preview" id="cardVisualPreview" style="background:linear-gradient(135deg,#f5a623,#d4881b);">
+          <div class="card-name" id="previewCardName">NexaCard Cashback</div>
+          <div class="card-tagline" id="previewCardTagline">Most Popular</div>
+        </div>
+        <ul class="card-feature-list" id="previewFeatureList">
+          <li>Up to 10% cashback on dining</li>
+          <li>5% cashback on petrol &amp; groceries</li>
+          <li>0% Easy Pay instalments</li>
+          <li>Accepted at 50M+ merchants</li>
+        </ul>
+        <div class="disclaimer">
+          Subject to credit assessment and NexaBank's approval. Terms and conditions apply. NexaBank Berhad is licensed by Bank Negara Malaysia.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-wrap">
+          <div class="logo-icon">N</div>
+          <div class="logo-text"><div class="logo-name">NexaBank</div><div class="logo-tagline">Digital Banking</div></div>
+        </div>
+        <p>NexaBank Berhad is a licensed financial institution regulated by Bank Negara Malaysia. Member of PIDM.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Personal</h4>
+        <ul>
+          <li><a href="savings-deposits.html">Savings &amp; Deposits</a></li>
+          <li><a href="credit-cards.html">Credit Cards</a></li>
+          <li><a href="home-financing.html">Home Financing</a></li>
+          <li><a href="personal-financing.html">Personal Financing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Security Tips</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 NexaBank Berhad. All rights reserved.</span>
+    <div class="footer-bottom-links"><a href="#">Privacy Policy</a><a href="#">Terms of Use</a></div>
+  </div>
+</footer>
+
+<script src="js/datalayer.js"></script>
+<script src="js/main.js"></script>
+<script>
+  var CARD_DATA = {
+    "cashback": {
+      name: "NexaCard Cashback",
+      tagline: "Most Popular",
+      bg: "linear-gradient(135deg,#f5a623,#d4881b)",
+      features: ["Up to 10% cashback on dining","5% cashback on petrol & groceries","0% Easy Pay instalments","Annual fee: RM 150 (waivable)"]
+    },
+    "platinum": {
+      name: "NexaCard Platinum",
+      tagline: "Premium",
+      bg: "linear-gradient(135deg,#1a1a2e,#3b82d4)",
+      features: ["Airport lounge access worldwide","5× reward points on travel","Travel insurance up to RM 1M","Min. income RM 60,000 p.a."]
+    },
+    "gold-i": {
+      name: "NexaCard Gold-i",
+      tagline: "Islamic",
+      bg: "linear-gradient(135deg,#0f3460,#3b82d4)",
+      features: ["Shariah-compliant (no interest)","3× NexaPoints on all spend","Annual fee: RM 100 (1st year free)","Min. income RM 24,000 p.a."]
+    }
+  };
+
+  // Persistent form ID across all steps
+  var cardAppFormID = null;
+
+  // Pre-select card from URL param + fire page start event
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var card = params.get("card") || "cashback";
+    setCardPreview(card);
+    var sel = document.getElementById("appCardType");
+    if (sel) sel.value = card;
+
+    // ── DataLayer: application start ──────────────────────────────
+    if (window.NexaBankDL) {
+      cardAppFormID = window.NexaBankDL.cardApplicationStep({
+        step:       "start",
+        stepNumber: 0,
+        cardType:   card,
+      });
+    }
+
+    // Fire formStart on first field interaction
+    var firstInteraction = false;
+    document.querySelectorAll("#step1 input, #step1 select").forEach(function (field) {
+      field.addEventListener("focus", function () {
+        if (!firstInteraction) {
+          firstInteraction = true;
+          if (window.NexaBankDL) {
+            window.NexaBankDL.formStart({
+              formID:   cardAppFormID,
+              formName: "Credit Card Application",
+              formType: "application",
+              firstField: field.name || field.id,
+            });
+          }
+        }
+      });
+    });
+  })();
+
+  function setCardPreview(cardKey) {
+    var data = CARD_DATA[cardKey] || CARD_DATA["cashback"];
+    document.getElementById("previewCardName").textContent = data.name;
+    document.getElementById("previewCardTagline").textContent = data.tagline;
+    document.getElementById("cardVisualPreview").style.background = data.bg;
+    var list = document.getElementById("previewFeatureList");
+    list.innerHTML = data.features.map(function(f){ return "<li>" + f + "</li>"; }).join("");
+  }
+
+  document.getElementById("appCardType") && document.getElementById("appCardType").addEventListener("change", function(){
+    setCardPreview(this.value || "cashback");
+  });
+
+  function validateStep(stepNum) {
+    var step = document.getElementById("step" + stepNum);
+    var required = step.querySelectorAll("[required]");
+    for (var i = 0; i < required.length; i++) {
+      if (!required[i].value.trim()) return false;
+    }
+    return true;
+  }
+
+  var STEP_NAMES = { 1: "personal-info", 2: "employment", 3: "review" };
+
+  function nextStep(current) {
+    if (!validateStep(current)) {
+      document.getElementById("step" + current + "Error").style.display = "block";
+      // ── DataLayer: validation error ──────────────────────────────
+      if (window.NexaBankDL) {
+        var errFields = [];
+        document.getElementById("step" + current).querySelectorAll("[required]").forEach(function(f){
+          if (!f.value.trim()) errFields.push(f.name || f.id);
+        });
+        window.NexaBankDL.cardApplicationStep({
+          formID:      cardAppFormID,
+          step:        "error",
+          stepNumber:  current,
+          cardType:    (document.getElementById("appCardType") || {}).value || "",
+          errorFields: errFields,
+        });
+      }
+      return;
+    }
+    document.getElementById("step" + current + "Error").style.display = "none";
+
+    if (current === 2) buildReviewSummary();
+
+    // ── DataLayer: step complete ────────────────────────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.cardApplicationStep({
+        formID:     cardAppFormID,
+        step:       STEP_NAMES[current] || ("step" + current),
+        stepNumber: current,
+        cardType:   (document.getElementById("appCardType") || {}).value || "",
+      });
+    }
+
+    document.getElementById("step" + current).classList.remove("active");
+    document.getElementById("step" + (current + 1)).classList.add("active");
+    document.getElementById("stepDot" + current).classList.remove("active");
+    document.getElementById("stepDot" + current).classList.add("done");
+    document.getElementById("stepDot" + (current + 1)).classList.add("active");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function prevStep(current) {
+    document.getElementById("step" + current).classList.remove("active");
+    document.getElementById("step" + (current - 1)).classList.add("active");
+    document.getElementById("stepDot" + current).classList.remove("active");
+    document.getElementById("stepDot" + (current - 1)).classList.remove("done");
+    document.getElementById("stepDot" + (current - 1)).classList.add("active");
+  }
+
+  function buildReviewSummary() {
+    var card = document.getElementById("appCardType").value;
+    var cardData = CARD_DATA[card] || {};
+    document.getElementById("reviewSummary").innerHTML =
+      "<strong>Full Name:</strong> " + (document.getElementById("appFullName").value || "—") + "<br>" +
+      "<strong>MyKad / NRIC:</strong> " + (document.getElementById("appIC").value || "—") + "<br>" +
+      "<strong>Email:</strong> " + (document.getElementById("appEmail").value || "—") + "<br>" +
+      "<strong>Mobile:</strong> " + (document.getElementById("appPhone").value || "—") + "<br>" +
+      "<strong>Employment:</strong> " + (document.getElementById("appEmpStatus").value || "—") + "<br>" +
+      "<strong>Monthly Income:</strong> RM " + (document.getElementById("appIncome").value || "—") + "<br>" +
+      "<strong>Card Applied:</strong> " + (cardData.name || card);
+
+    // ── DataLayer: review step reached ─────────────────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.cardApplicationStep({
+        formID:     cardAppFormID,
+        step:       "review",
+        stepNumber: 3,
+        cardType:   card,
+      });
+    }
+  }
+
+  function submitApplication() {
+    var consent = document.getElementById("appConsent");
+    if (!consent.checked) {
+      document.getElementById("step3Error").style.display = "block";
+      // ── DataLayer: consent error ────────────────────────────────
+      if (window.NexaBankDL) {
+        window.NexaBankDL.cardApplicationStep({
+          formID:      cardAppFormID,
+          step:        "error",
+          stepNumber:  3,
+          cardType:    (document.getElementById("appCardType") || {}).value || "",
+          errorFields: ["consent"],
+        });
+      }
+      return;
+    }
+    document.getElementById("step3Error").style.display = "none";
+
+    var cardType   = (document.getElementById("appCardType") || {}).value || "";
+    var emailVal   = (document.getElementById("appEmail") || {}).value || "";
+    var ref        = "NB-CARD-" + Date.now().toString().slice(-6);
+
+    document.getElementById("step3").classList.remove("active");
+    document.getElementById("stepDot3").classList.remove("active");
+    document.getElementById("stepDot3").classList.add("done");
+    document.getElementById("stepSuccess").classList.add("active");
+    document.getElementById("appRefNumber").textContent = ref;
+
+    // ── DataLayer: application complete ────────────────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.cardApplicationComplete({
+        formID:         cardAppFormID,
+        cardType:       cardType,
+        referenceNo:    ref,
+        applicantEmail: emailVal,
+      });
+    }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+</script>
+</body>
+</html>

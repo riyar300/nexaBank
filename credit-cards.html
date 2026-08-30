@@ -97,7 +97,7 @@
             <li>10% on dining (capped RM 50/month)</li>
             <li>Annual fee: RM 150 (waivable)</li>
           </ul>
-          <a href="contact.html" class="btn-card" data-cta-name="apply-cashback-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
+          <a href="card-application.html?card=cashback" class="btn-card" data-cta-name="apply-cashback-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
         </div>
       </div>
 
@@ -113,7 +113,7 @@
             <li>Travel insurance up to RM 1M</li>
             <li>Min. income RM 60,000 p.a.</li>
           </ul>
-          <a href="contact.html" class="btn-card" data-cta-name="apply-platinum-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
+          <a href="card-application.html?card=platinum" class="btn-card" data-cta-name="apply-platinum-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
         </div>
       </div>
 
@@ -129,7 +129,7 @@
             <li>Min. income RM 24,000 p.a.</li>
             <li>Annual fee: RM 100 (first year free)</li>
           </ul>
-          <a href="contact.html" class="btn-card" data-cta-name="apply-gold-i-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
+          <a href="card-application.html?card=gold-i" class="btn-card" data-cta-name="apply-gold-i-card" data-cta-location="Credit Cards Page" data-product-category="Credit Cards">Apply Now</a>
         </div>
       </div>
 
@@ -195,7 +195,7 @@
       </div>
     </div>
     <div style="text-align:center;margin-top:32px;">
-      <a href="contact.html" class="btn-primary" data-cta-name="cards-page-apply" data-cta-location="Credit Cards Eligibility Section">Apply for a Card</a>
+      <a href="card-application.html" class="btn-primary" data-cta-name="cards-page-apply" data-cta-location="Credit Cards Eligibility Section">Apply for a Card</a>
     </div>
   </div>
 </section>
@@ -204,7 +204,7 @@
   <div class="container">
     <h2 style="font-size:26px;font-weight:800;margin-bottom:10px;">Not sure which card is right for you?</h2>
     <p style="color:rgba(255,255,255,.75);font-size:15px;margin-bottom:24px;">Our financial advisors are happy to help you choose.</p>
-    <a href="contact.html" class="btn-primary" data-cta-name="cards-cta-contact" data-cta-location="Credit Cards Page CTA">Contact Us</a>
+    <a href="card-application.html" class="btn-primary" data-cta-name="cards-cta-apply" data-cta-location="Credit Cards Page CTA">Apply Now</a>
   </div>
 </div>
 
@@ -271,5 +271,17 @@
 
 <script src="js/datalayer.js"></script>
 <script src="js/main.js"></script>
+<script>
+  // ── Product Impression – Credit Cards page ────────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.NexaBankDL) {
+      window.NexaBankDL.productImpression([
+        { productID: "NB-CC-001", productName: "NexaCard Cashback",  productCategory: "Credit Cards", productSubCategory: "Cashback Card"  },
+        { productID: "NB-CC-002", productName: "NexaCard Platinum",  productCategory: "Credit Cards", productSubCategory: "Premium Card"   },
+        { productID: "NB-CC-003", productName: "NexaCard Gold-i",    productCategory: "Credit Cards", productSubCategory: "Islamic Card"   },
+      ]);
+    }
+  });
+</script>
 </body>
 </html>

@@ -143,25 +143,64 @@
     <h2 class="section-title">Estimate Your Monthly Instalment</h2>
     <p class="section-sub">Quick indicative calculation — actual rates may vary</p>
     <div style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:32px;margin-top:8px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;">
-        <div class="form-group">
-          <label for="loanAmt">Financing Amount (RM)</label>
-          <input type="number" id="loanAmt" placeholder="e.g. 50000" />
+
+      <!-- Step 1: Loan inputs -->
+      <div id="plCalcStep1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;">
+          <div class="form-group">
+            <label for="loanAmt">Financing Amount (RM)</label>
+            <input type="number" id="loanAmt" placeholder="e.g. 50000" />
+          </div>
+          <div class="form-group">
+            <label for="loanTenurePL">Tenure (Years)</label>
+            <input type="number" id="loanTenurePL" placeholder="e.g. 5" />
+          </div>
+          <div class="form-group" style="grid-column:1/-1;">
+            <label for="loanRate">Interest / Profit Rate (% p.a. flat)</label>
+            <input type="number" id="loanRate" placeholder="e.g. 4.50" step="0.01" />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="loanTenurePL">Tenure (Years)</label>
-          <input type="number" id="loanTenurePL" placeholder="e.g. 5" />
+        <button class="btn-primary" style="margin-top:12px;width:100%;"
+          data-cta-name="calc-personal-loan-next"
+          data-cta-location="Personal Financing Calculator"
+          onclick="showPLEmailStep()">Next →</button>
+        <div id="plStep1Error" class="field-error" style="margin-top:8px;display:none;">Please fill in all fields above.</div>
+      </div>
+
+      <!-- Step 2: Email gate -->
+      <div id="plCalcStep2" style="display:none;">
+        <div style="background:var(--surface);border-radius:8px;padding:18px 16px;margin-bottom:16px;font-size:13.5px;color:var(--text-muted);">
+          Your result is ready! Enter your email to receive it along with a personalised financing offer.
         </div>
-        <div class="form-group" style="grid-column:1/-1;">
-          <label for="loanRate">Interest / Profit Rate (% p.a. flat)</label>
-          <input type="number" id="loanRate" placeholder="e.g. 4.50" step="0.01" />
+        <div class="form-group" style="text-align:left;">
+          <label for="plCalcEmail">Email Address</label>
+          <input type="email" id="plCalcEmail" placeholder="you@example.com" />
+          <div id="plEmailError" class="field-error" style="display:none;">Please enter a valid email address.</div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button class="btn-outline" style="flex:1;color:var(--secondary);border-color:var(--border);font-size:14px;padding:10px;"
+            onclick="backToPLStep1()">← Back</button>
+          <button class="btn-primary" style="flex:2;"
+            data-cta-name="calc-personal-loan-submit"
+            data-cta-location="Personal Financing Calculator"
+            onclick="calcPersonalLoan()">Show My Result</button>
         </div>
       </div>
-      <button class="btn-primary" style="margin-top:12px;width:100%;"
-        data-cta-name="calc-personal-loan"
-        data-cta-location="Personal Financing Calculator"
-        onclick="calcPersonalLoan()">Calculate</button>
-      <div id="plCalcResult" style="margin-top:18px;font-size:18px;font-weight:700;color:var(--secondary);display:none;"></div>
+
+      <!-- Step 3: Result -->
+      <div id="plCalcResult" style="display:none;margin-top:18px;">
+        <div style="background:var(--surface);border-radius:8px;padding:20px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">Estimated Monthly Instalment</div>
+          <div id="plCalcResultAmount" style="font-size:30px;font-weight:800;color:var(--secondary);"></div>
+          <div id="plCalcResultSub" style="font-size:13px;color:var(--text-muted);margin-top:6px;"></div>
+        </div>
+        <div style="margin-top:14px;font-size:12.5px;color:var(--text-muted);">
+          ✅ A detailed quote has been sent to <strong id="plEmailSent"></strong>
+        </div>
+        <button class="btn-outline" style="margin-top:14px;width:100%;color:var(--secondary);border-color:var(--border);font-size:13.5px;padding:9px;"
+          onclick="resetPLCalc()">Calculate Again</button>
+      </div>
+
     </div>
   </div>
 </section>
@@ -300,20 +339,98 @@
 <script src="js/datalayer.js"></script>
 <script src="js/main.js"></script>
 <script>
-  function calcPersonalLoan() {
-    var P = parseFloat(document.getElementById("loanAmt").value) || 0;
-    var n = parseFloat(document.getElementById("loanTenurePL").value) || 5;
-    var r = parseFloat(document.getElementById("loanRate").value) || 4.5;
-    var total = P + (P * r / 100 * n);
-    var monthly = total / (n * 12);
-    var result = document.getElementById("plCalcResult");
-    if (P > 0 && monthly > 0) {
-      result.style.display = "block";
-      result.innerHTML = "Estimated Monthly Instalment: <span style='color:var(--primary-dk)'>RM " + monthly.toFixed(2) + "</span>";
-      if (window.NexaBankDL) {
-        window.NexaBankDL.ctaClick({ ctaName: "personal-loan-calculator", ctaLocation: "Personal Financing Calculator", productCategory: "Personal Financing" });
-      }
+  // ── Product Impression – Personal Financing page ──────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.NexaBankDL) {
+      window.NexaBankDL.productImpression([
+        { productID: "NB-PF-001", productName: "NexaLoan Express",   productCategory: "Loans & Financing", productSubCategory: "Personal Loan"        },
+        { productID: "NB-PF-002", productName: "NexaFinancing-i",    productCategory: "Loans & Financing", productSubCategory: "Islamic Personal Loan" },
+        { productID: "NB-PF-003", productName: "NexaGovt Scheme",    productCategory: "Loans & Financing", productSubCategory: "Government Scheme"     },
+      ]);
     }
+  });
+
+  // Persistent calculator session ID
+  var plCalcID = null;
+
+  // Fire calculator start on first input interaction
+  document.querySelectorAll("#plCalcStep1 input").forEach(function (field) {
+    field.addEventListener("focus", function () {
+      if (!plCalcID && window.NexaBankDL) {
+        plCalcID = "PL-" + Date.now();
+        window.NexaBankDL.calculatorInteraction({
+          calculatorType: "Personal Financing",
+          calculatorID:   plCalcID,
+          step:           "start",
+          inputs:         {},
+        });
+      }
+    }, { once: true });
+  });
+
+  function showPLEmailStep() {
+    var P = parseFloat(document.getElementById("loanAmt").value);
+    var n = parseFloat(document.getElementById("loanTenurePL").value);
+    var r = parseFloat(document.getElementById("loanRate").value);
+    var errEl = document.getElementById("plStep1Error");
+    if (!P || !n || !r) { errEl.style.display = "block"; return; }
+    errEl.style.display = "none";
+    document.getElementById("plCalcStep1").style.display = "none";
+    document.getElementById("plCalcStep2").style.display = "block";
+
+    // ── DataLayer: inputs submitted → email gate ─────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.calculatorInteraction({
+        calculatorType: "Personal Financing",
+        calculatorID:   plCalcID,
+        step:           "emailGate",
+        inputs:         { loanAmount: P, tenure: n, rate: r },
+      });
+    }
+  }
+
+  function backToPLStep1() {
+    document.getElementById("plCalcStep2").style.display = "none";
+    document.getElementById("plCalcStep1").style.display = "block";
+  }
+
+  function calcPersonalLoan() {
+    var emailEl    = document.getElementById("plCalcEmail");
+    var emailErrEl = document.getElementById("plEmailError");
+    var email      = emailEl ? emailEl.value.trim() : "";
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailErrEl.style.display = "block";
+      return;
+    }
+    emailErrEl.style.display = "none";
+    var P       = parseFloat(document.getElementById("loanAmt").value)      || 0;
+    var n       = parseFloat(document.getElementById("loanTenurePL").value) || 5;
+    var r       = parseFloat(document.getElementById("loanRate").value)     || 4.5;
+    var total   = P + (P * r / 100 * n);
+    var monthly = total / (n * 12);
+    document.getElementById("plCalcStep2").style.display      = "none";
+    document.getElementById("plCalcResult").style.display     = "block";
+    document.getElementById("plCalcResultAmount").textContent = "RM " + monthly.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " /month";
+    document.getElementById("plCalcResultSub").textContent    = "Based on RM " + P.toLocaleString("en-MY", { maximumFractionDigits: 0 }) + " over " + n + " years at " + r + "% p.a. flat";
+    document.getElementById("plEmailSent").textContent        = email;
+
+    // ── DataLayer: result shown ───────────────────────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.calculatorInteraction({
+        calculatorType: "Personal Financing",
+        calculatorID:   plCalcID,
+        step:           "complete",
+        inputs:         { loanAmount: P, tenure: n, rate: r, email: email },
+        result:         { monthlyPayment: parseFloat(monthly.toFixed(2)) },
+      });
+    }
+  }
+
+  function resetPLCalc() {
+    document.getElementById("plCalcResult").style.display = "none";
+    document.getElementById("plCalcEmail").value          = "";
+    document.getElementById("plCalcStep1").style.display  = "block";
+    plCalcID = null; // reset so a new session ID is assigned on next use
   }
 </script>
 </body>

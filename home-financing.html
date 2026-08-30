@@ -137,35 +137,74 @@
   </div>
 </section>
 
-<!-- EMI Calculator placeholder -->
+<!-- EMI Calculator -->
 <section style="padding:50px 0; background:var(--surface);">
   <div class="container" style="max-width:680px;text-align:center;">
     <h2 class="section-title">Estimate Your Monthly Payment</h2>
     <p class="section-sub">Use our indicative guide to plan your home purchase</p>
     <div style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:32px;margin-top:8px;">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;">
-        <div class="form-group">
-          <label for="propValue">Property Value (RM)</label>
-          <input type="number" id="propValue" placeholder="e.g. 500000" />
+
+      <!-- Step 1: Loan inputs -->
+      <div id="calcStep1">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;text-align:left;">
+          <div class="form-group">
+            <label for="propValue">Property Value (RM)</label>
+            <input type="number" id="propValue" placeholder="e.g. 500000" />
+          </div>
+          <div class="form-group">
+            <label for="downPayment">Down Payment (%)</label>
+            <input type="number" id="downPayment" placeholder="e.g. 10" />
+          </div>
+          <div class="form-group">
+            <label for="loanTenure">Tenure (Years)</label>
+            <input type="number" id="loanTenure" placeholder="e.g. 30" />
+          </div>
+          <div class="form-group">
+            <label for="interestRate">Interest Rate (% p.a.)</label>
+            <input type="number" id="interestRate" placeholder="e.g. 3.25" step="0.01" />
+          </div>
         </div>
-        <div class="form-group">
-          <label for="downPayment">Down Payment (%)</label>
-          <input type="number" id="downPayment" placeholder="e.g. 10" />
+        <button class="btn-primary" style="margin-top:12px;width:100%;"
+          data-cta-name="calc-home-loan-next"
+          data-cta-location="Home Financing Calculator"
+          onclick="showHomeEmailStep()">Next →</button>
+        <div id="calcStep1Error" class="field-error" style="margin-top:8px;display:none;">Please fill in all fields above.</div>
+      </div>
+
+      <!-- Step 2: Email gate (shown after inputs) -->
+      <div id="calcStep2" style="display:none;">
+        <div style="background:var(--surface);border-radius:8px;padding:18px 16px;margin-bottom:16px;font-size:13.5px;color:var(--text-muted);">
+          Your result is ready! Enter your email to receive it along with a personalised home financing quote.
         </div>
-        <div class="form-group">
-          <label for="loanTenure">Tenure (Years)</label>
-          <input type="number" id="loanTenure" placeholder="e.g. 30" />
+        <div class="form-group" style="text-align:left;">
+          <label for="calcEmail">Email Address</label>
+          <input type="email" id="calcEmail" placeholder="you@example.com" />
+          <div id="calcEmailError" class="field-error" style="display:none;">Please enter a valid email address.</div>
         </div>
-        <div class="form-group">
-          <label for="interestRate">Interest Rate (% p.a.)</label>
-          <input type="number" id="interestRate" placeholder="e.g. 3.25" step="0.01" />
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <button class="btn-outline" style="flex:1;color:var(--secondary);border-color:var(--border);font-size:14px;padding:10px;"
+            onclick="backToHomeCalcStep1()">← Back</button>
+          <button class="btn-primary" style="flex:2;"
+            data-cta-name="calc-home-loan-submit"
+            data-cta-location="Home Financing Calculator"
+            onclick="calcHomeLoan()">Show My Result</button>
         </div>
       </div>
-      <button class="btn-primary" style="margin-top:12px;width:100%;"
-        data-cta-name="calc-home-loan"
-        data-cta-location="Home Financing Calculator"
-        onclick="calcHomeLoan()">Calculate</button>
-      <div id="calcResult" style="margin-top:18px;font-size:18px;font-weight:700;color:var(--secondary);display:none;"></div>
+
+      <!-- Step 3: Result -->
+      <div id="calcResult" style="display:none;margin-top:18px;">
+        <div style="background:var(--surface);border-radius:8px;padding:20px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">Estimated Monthly Repayment</div>
+          <div id="calcResultAmount" style="font-size:30px;font-weight:800;color:var(--secondary);"></div>
+          <div id="calcResultSub" style="font-size:13px;color:var(--text-muted);margin-top:6px;"></div>
+        </div>
+        <div style="margin-top:14px;font-size:12.5px;color:var(--text-muted);">
+          ✅ A detailed quote has been sent to <strong id="calcEmailSent"></strong>
+        </div>
+        <button class="btn-outline" style="margin-top:14px;width:100%;color:var(--secondary);border-color:var(--border);font-size:13.5px;padding:9px;"
+          onclick="resetHomeCalc()">Calculate Again</button>
+      </div>
+
     </div>
   </div>
 </section>
@@ -273,23 +312,108 @@
 <script src="js/datalayer.js"></script>
 <script src="js/main.js"></script>
 <script>
-  function calcHomeLoan() {
-    var P = parseFloat(document.getElementById("propValue").value) || 0;
-    var dp = parseFloat(document.getElementById("downPayment").value) || 10;
-    var n = parseFloat(document.getElementById("loanTenure").value) || 30;
-    var r = parseFloat(document.getElementById("interestRate").value) || 3.25;
-    var loan = P * (1 - dp / 100);
-    var monthlyRate = r / 100 / 12;
-    var months = n * 12;
-    var emi = loan * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
-    var result = document.getElementById("calcResult");
-    if (loan > 0 && emi > 0) {
-      result.style.display = "block";
-      result.innerHTML = "Estimated Monthly Payment: <span style='color:var(--primary-dk)'>RM " + emi.toFixed(2) + "</span>";
-      if (window.NexaBankDL) {
-        window.NexaBankDL.ctaClick({ ctaName: "home-loan-calculator", ctaLocation: "Home Financing Calculator", productCategory: "Home Financing" });
-      }
+  // ── Product Impression – Home Financing page ──────────────────────────────
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.NexaBankDL) {
+      window.NexaBankDL.productImpression([
+        { productID: "NB-HF-001", productName: "NexaHome Flexi",     productCategory: "Loans & Financing", productSubCategory: "Home Loan"        },
+        { productID: "NB-HF-002", productName: "NexaHome-i",         productCategory: "Loans & Financing", productSubCategory: "Islamic Home Loan" },
+        { productID: "NB-HF-003", productName: "NexaHome Refinance", productCategory: "Loans & Financing", productSubCategory: "Refinancing"       },
+      ]);
     }
+  });
+
+  // Persistent calculator session ID
+  var homeCalcID = null;
+
+  // Fire calculator start on first input interaction
+  document.querySelectorAll("#calcStep1 input").forEach(function (field) {
+    field.addEventListener("focus", function () {
+      if (!homeCalcID && window.NexaBankDL) {
+        homeCalcID = "HC-" + Date.now();
+        window.NexaBankDL.calculatorInteraction({
+          calculatorType: "Home Financing",
+          calculatorID:   homeCalcID,
+          step:           "start",
+          inputs:         {},
+        });
+      }
+    }, { once: true });
+  });
+
+  function showHomeEmailStep() {
+    var P  = parseFloat(document.getElementById("propValue").value);
+    var dp = parseFloat(document.getElementById("downPayment").value);
+    var n  = parseFloat(document.getElementById("loanTenure").value);
+    var r  = parseFloat(document.getElementById("interestRate").value);
+    var errEl = document.getElementById("calcStep1Error");
+    if (!P || !dp || !n || !r) {
+      errEl.style.display = "block";
+      return;
+    }
+    errEl.style.display = "none";
+    document.getElementById("calcStep1").style.display = "none";
+    document.getElementById("calcStep2").style.display = "block";
+
+    // ── DataLayer: inputs submitted → email gate ─────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.calculatorInteraction({
+        calculatorType: "Home Financing",
+        calculatorID:   homeCalcID,
+        step:           "emailGate",
+        inputs:         { loanAmount: P * (1 - dp / 100), downPayment: dp, tenure: n, rate: r },
+      });
+    }
+  }
+
+  function backToHomeCalcStep1() {
+    document.getElementById("calcStep2").style.display = "none";
+    document.getElementById("calcStep1").style.display = "block";
+  }
+
+  function calcHomeLoan() {
+    var emailEl    = document.getElementById("calcEmail");
+    var emailErrEl = document.getElementById("calcEmailError");
+    var email      = emailEl ? emailEl.value.trim() : "";
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      emailErrEl.style.display = "block";
+      return;
+    }
+    emailErrEl.style.display = "none";
+
+    var P  = parseFloat(document.getElementById("propValue").value)  || 0;
+    var dp = parseFloat(document.getElementById("downPayment").value) || 10;
+    var n  = parseFloat(document.getElementById("loanTenure").value)  || 30;
+    var r  = parseFloat(document.getElementById("interestRate").value)|| 3.25;
+    var loan        = P * (1 - dp / 100);
+    var monthlyRate = r / 100 / 12;
+    var months      = n * 12;
+    var emi = loan * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+
+    document.getElementById("calcStep2").style.display = "none";
+    var resultBox = document.getElementById("calcResult");
+    resultBox.style.display = "block";
+    document.getElementById("calcResultAmount").textContent = "RM " + emi.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " /month";
+    document.getElementById("calcResultSub").textContent    = "Based on RM " + loan.toLocaleString("en-MY", { maximumFractionDigits: 0 }) + " loan over " + n + " years at " + r + "% p.a.";
+    document.getElementById("calcEmailSent").textContent    = email;
+
+    // ── DataLayer: result shown ───────────────────────────────────
+    if (window.NexaBankDL) {
+      window.NexaBankDL.calculatorInteraction({
+        calculatorType: "Home Financing",
+        calculatorID:   homeCalcID,
+        step:           "complete",
+        inputs:         { loanAmount: loan, downPayment: dp, tenure: n, rate: r, email: email },
+        result:         { monthlyPayment: parseFloat(emi.toFixed(2)) },
+      });
+    }
+  }
+
+  function resetHomeCalc() {
+    document.getElementById("calcResult").style.display = "none";
+    document.getElementById("calcEmail").value = "";
+    document.getElementById("calcStep1").style.display = "block";
+    homeCalcID = null; // reset so a new session ID is assigned on next use
   }
 </script>
 </body>
