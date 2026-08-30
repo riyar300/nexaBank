@@ -286,6 +286,9 @@
           <a href="contact.html" class="qa-btn" data-cta-name="dash-support" data-cta-location="Dashboard Quick Actions">
             <span class="qa-btn-icon">🎧</span>Support
           </a>
+          <a href="ekyc.html" class="qa-btn" data-cta-name="dash-ekyc" data-cta-location="Dashboard Quick Actions" style="grid-column:span 2;">
+            <span class="qa-btn-icon">🪪</span>eKYC Verification
+          </a>
         </div>
       </div>
 
@@ -296,6 +299,15 @@
         <p>Enjoy airport lounge access, 5× travel rewards and up to RM 1M travel insurance.</p>
         <a href="card-application.html?card=platinum" class="btn-primary" style="font-size:13px;padding:9px 18px;"
           data-cta-name="dash-upgrade-card" data-cta-location="Dashboard Promo">Apply Now</a>
+      </div>
+
+      <!-- New customer shortcut -->
+      <div class="dash-card" style="margin-top:20px; border-left: 3px solid var(--primary);">
+        <h3>New Customer Demo</h3>
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">View AHakim's first-time account with RM 0.00 balance and first transaction flow.</div>
+        <a href="first-transaction.html" style="display:inline-block;background:var(--primary);color:var(--secondary);font-weight:700;font-size:13px;padding:9px 18px;border-radius:var(--radius);text-decoration:none;">
+          View AHakim's Account →
+        </a>
       </div>
 
       <!-- Security -->
@@ -341,5 +353,23 @@
     window.location.href = "index.html";
   }
 </script>
+
+<!-- ── Consent Banner ─────────────────────────────────────────────────────── -->
+<div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
+  <div class="consent-body">
+    <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
+    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <div class="consent-categories">
+      <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
+      <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
+      <label class="consent-category"><input type="checkbox" id="consent-analytics"> Analytics</label>
+      <label class="consent-category"><input type="checkbox" id="consent-marketing"> Marketing</label>
+    </div>
+  </div>
+  <div class="consent-actions">
+    <button class="consent-btn consent-btn-accept" id="consent-accept">Accept All</button>
+    <button class="consent-btn consent-btn-reject" id="consent-reject">Reject Non-Essential</button>
+  </div>
+</div>
 </body>
 </html>

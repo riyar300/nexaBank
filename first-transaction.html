@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="page-data" content='{
+    "pageName": "NexaBank | First Transaction",
+    "pageCategory": "Authenticated",
+    "pageSubCategory": "First Transaction",
+    "pageType": "dashboard",
+    "pageLanguage": "en"
+  }' />
+  <title>Welcome, AHakim | NexaBank</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* ── Page shell ─────────────────────────────────── */
+    body { background: var(--surface); }
+
+    /* ── Dashboard header (matches dashboard.html) ── */
+    .dashboard-header { background: var(--secondary); color: var(--white); }
+    .dashboard-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; height: 64px; max-width: 1200px; margin: 0 auto;
+    }
+    .dash-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .dash-logo .logo-name { color: var(--white); font-size: 20px; font-weight: 800; }
+    .dash-logo .logo-tagline { color: rgba(255,255,255,.5); font-size: 10px; text-transform: uppercase; letter-spacing: .5px; }
+    .dash-user-bar { display: flex; align-items: center; gap: 16px; }
+    .user-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,.1); border-radius: 24px; padding: 6px 14px 6px 8px;
+    }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--primary); color: var(--secondary);
+      font-size: 14px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .user-name { font-size: 13.5px; font-weight: 600; color: var(--white); }
+    .btn-signout {
+      background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
+      color: rgba(255,255,255,.8); font-size: 13px; padding: 7px 14px;
+      border-radius: var(--radius); cursor: pointer; transition: background .2s; text-decoration: none;
+      display: inline-block;
+    }
+    .btn-signout:hover { background: rgba(255,255,255,.22); color: var(--white); text-decoration: none; }
+    .dash-nav { background: rgba(0,0,0,.2); border-top: 1px solid rgba(255,255,255,.08); }
+    .dash-nav-inner { display: flex; gap: 4px; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .dash-nav-link {
+      display: block; padding: 10px 16px; font-size: 13.5px; font-weight: 500;
+      color: rgba(255,255,255,.65); border-bottom: 3px solid transparent;
+      transition: color .2s, border-color .2s; white-space: nowrap; text-decoration: none;
+    }
+    .dash-nav-link:hover, .dash-nav-link.active { color: var(--primary); border-bottom-color: var(--primary); text-decoration: none; }
+
+    /* ── Welcome confetti banner ─────────────────────── */
+    .welcome-banner {
+      background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+      color: var(--white); padding: 36px 0 32px;
+    }
+    .welcome-inner { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .welcome-text h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+    .welcome-text h2 span { color: var(--primary); }
+    .welcome-text p { font-size: 14px; color: rgba(255,255,255,.7); }
+    .welcome-badge {
+      background: var(--primary); color: var(--secondary);
+      font-size: 11px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .8px; padding: 4px 12px; border-radius: 20px;
+      display: inline-block; margin-bottom: 8px;
+    }
+
+    /* ── Body grid ───────────────────────────────────── */
+    .dash-body { padding: 32px 0 80px; }
+    .dash-grid { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+    .dash-card { background: var(--white); border-radius: 10px; border: 1px solid var(--border); padding: 22px 24px; }
+    .dash-card h3 { font-size: 14px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 18px; }
+
+    /* ── Account tile ────────────────────────────────── */
+    .acc-tile {
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--surface); border-radius: 8px; padding: 14px 16px;
+      border: 1px solid var(--border);
+    }
+    .acc-tile-left { display: flex; gap: 12px; align-items: center; }
+    .acc-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .acc-name { font-size: 14px; font-weight: 600; color: var(--secondary); }
+    .acc-num  { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .acc-balance { text-align: right; }
+    .acc-amount { font-size: 20px; font-weight: 800; color: var(--secondary); }
+    .acc-label  { font-size: 11.5px; color: var(--text-muted); }
+    .zero-badge {
+      display: inline-block; background: #fff8e1; color: #b07d00;
+      font-size: 10.5px; font-weight: 700; padding: 2px 9px; border-radius: 20px;
+      margin-top: 4px; letter-spacing: .3px;
+    }
+
+    /* ── First txn celebration card ─────────────────── */
+    .first-txn-banner {
+      background: linear-gradient(135deg, #1a1a2e, #0f3460);
+      border-radius: 12px; padding: 26px 28px; margin-bottom: 20px;
+      color: var(--white); display: flex; gap: 20px; align-items: flex-start;
+    }
+    .first-txn-emoji { font-size: 40px; flex-shrink: 0; margin-top: 2px; }
+    .first-txn-title { font-size: 17px; font-weight: 800; margin-bottom: 5px; }
+    .first-txn-title span { color: var(--primary); }
+    .first-txn-sub { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 14px; }
+    .btn-fund {
+      background: var(--primary); color: var(--secondary);
+      font-weight: 700; font-size: 13px; padding: 9px 20px;
+      border: none; border-radius: var(--radius); cursor: pointer; text-decoration: none;
+      display: inline-block; transition: background .2s;
+    }
+    .btn-fund:hover { background: var(--primary-dk); text-decoration: none; }
+
+    /* ── Transaction list ────────────────────────────── */
+    .txn-list { list-style: none; }
+    .txn-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid var(--border);
+    }
+    .txn-item:last-child { border: none; }
+    .txn-left { display: flex; gap: 10px; align-items: center; }
+    .txn-icon { width: 34px; height: 34px; border-radius: 50%; background: var(--surface); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .txn-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+    .txn-date { font-size: 12px; color: var(--text-muted); }
+    .txn-amt  { font-size: 14px; font-weight: 700; }
+    .txn-amt.credit { color: var(--green); }
+
+    /* ── Empty-state txn placeholder ────────────────── */
+    .txn-empty {
+      text-align: center; padding: 32px 16px; color: var(--text-muted);
+    }
+    .txn-empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .txn-empty-msg  { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .txn-empty-sub  { font-size: 12.5px; }
+
+    /* ── Right column ────────────────────────────────── */
+    .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .qa-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      background: var(--surface); border-radius: 8px; border: 1px solid var(--border);
+      padding: 16px 10px; cursor: pointer; font-size: 12.5px; font-weight: 600;
+      color: var(--secondary); text-align: center;
+      transition: border-color .2s, box-shadow .2s; text-decoration: none;
+    }
+    .qa-btn:hover { border-color: var(--primary); box-shadow: 0 3px 12px rgba(245,166,35,.15); text-decoration: none; }
+    .qa-btn-icon { font-size: 22px; }
+
+    /* ── eKYC status card ────────────────────────────── */
+    .kyc-status-card { margin-top: 20px; }
+    .kyc-status-row { display: flex; justify-content: space-between; align-items: center; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .kyc-status-row:last-child { border: none; }
+    .kyc-status-key { color: var(--text-muted); }
+    .kyc-badge-ok { background: #e8f5e9; color: var(--green); font-size: 11.5px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+    .kyc-badge-ref { font-size: 12px; font-weight: 600; color: var(--secondary); }
+
+    /* ── First-txn modal overlay ─────────────────────── */
+    .txn-modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9000; padding: 20px;
+    }
+    .txn-modal {
+      background: var(--white); border-radius: 14px; padding: 36px 32px;
+      max-width: 420px; width: 100%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+    .txn-modal-icon { font-size: 56px; margin-bottom: 14px; }
+    .txn-modal-title { font-size: 20px; font-weight: 800; color: var(--secondary); margin-bottom: 8px; }
+    .txn-modal-sub { font-size: 13.5px; color: var(--text-muted); margin-bottom: 22px; line-height: 1.6; }
+    .txn-modal-details {
+      background: var(--surface); border-radius: 8px; padding: 14px 18px;
+      font-size: 13px; margin-bottom: 22px; text-align: left;
+    }
+    .txn-modal-row { display: flex; justify-content: space-between; padding: 5px 0; }
+    .txn-modal-key { color: var(--text-muted); }
+    .txn-modal-val { font-weight: 700; color: var(--secondary); }
+    .txn-modal-val.green { color: var(--green); }
+    .btn-modal-close {
+      background: var(--primary); color: var(--secondary);
+      font-weight: 700; font-size: 14px; padding: 11px 32px;
+      border: none; border-radius: var(--radius); cursor: pointer; width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(4, 1fr); }
+      .first-txn-banner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Dashboard header ───────────────────────────────────────────────────── -->
+<div class="dashboard-header">
+  <div class="dashboard-topbar">
+    <a href="index.html" class="dash-logo">
+      <div class="logo-icon">N</div>
+      <div>
+        <div class="logo-name">NexaBank</div>
+        <div class="logo-tagline">Digital Banking</div>
+      </div>
+    </a>
+    <div class="dash-user-bar">
+      <div class="user-chip">
+        <div class="user-avatar">A</div>
+        <span class="user-name">Welcome, <strong>AHakim</strong></span>
+      </div>
+      <a href="index.html" class="btn-signout">Sign Out</a>
+    </div>
+  </div>
+  <div class="dash-nav">
+    <div class="dash-nav-inner">
+      <a href="#" class="dash-nav-link active">Overview</a>
+      <a href="#" class="dash-nav-link">Accounts</a>
+      <a href="#" class="dash-nav-link">Transfer</a>
+      <a href="#" class="dash-nav-link">Pay Bills</a>
+      <a href="contact.html" class="dash-nav-link">Support</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Welcome banner ─────────────────────────────────────────────────────── -->
+<div class="welcome-banner">
+  <div class="welcome-inner">
+    <div class="welcome-text">
+      <div class="welcome-badge">🎉 New Customer</div>
+      <h2>Welcome to NexaBank, <span>AHakim</span>! 👋</h2>
+      <p>Your identity has been verified. Your account is now fully active.</p>
+    </div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5);text-align:right;" id="ftDate"></div>
+  </div>
+</div>
+
+<!-- ── Dashboard body ─────────────────────────────────────────────────────── -->
+<div class="dash-body">
+  <div class="dash-grid">
+
+    <!-- LEFT COL -->
+    <div>
+      <!-- First-txn celebration prompt -->
+      <div class="first-txn-banner">
+        <div class="first-txn-emoji">🏦</div>
+        <div>
+          <div class="first-txn-title">Your account balance is <span>RM 0.00</span></div>
+          <div class="first-txn-sub">Fund your account now to start transacting — transfers, bill payments, and more are waiting for you.</div>
+          <button class="btn-fund" onclick="showFirstTxnModal()">Make Your First Deposit</button>
+        </div>
+      </div>
+
+      <!-- Account tile -->
+      <div class="dash-card">
+        <h3>My Accounts</h3>
+        <div class="acc-tile">
+          <div class="acc-tile-left">
+            <div class="acc-icon" style="background:#fff8ec;">🏦</div>
+            <div>
+              <div class="acc-name">NexaSave-i Savings</div>
+              <div class="acc-num">•••• •••• 8801</div>
+            </div>
+          </div>
+          <div class="acc-balance">
+            <div class="acc-amount" id="accBalance">RM 0.00</div>
+            <div class="acc-label">Available Balance</div>
+            <div class="zero-badge" id="zeroBadge">No funds yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions -->
+      <div class="dash-card" style="margin-top:20px;">
+        <h3>Recent Transactions</h3>
+        <div class="txn-empty" id="txnEmpty">
+          <div class="txn-empty-icon">📭</div>
+          <div class="txn-empty-msg">No transactions yet</div>
+          <div class="txn-empty-sub">Your first transaction will appear here once you make a deposit.</div>
+        </div>
+        <ul class="txn-list" id="txnList" style="display:none;"></ul>
+      </div>
+    </div>
+
+    <!-- RIGHT COL -->
+    <div>
+      <!-- Quick actions -->
+      <div class="dash-card">
+        <h3>Quick Actions</h3>
+        <div class="quick-actions">
+          <a href="#" class="qa-btn" onclick="showFirstTxnModal();return false;">
+            <span class="qa-btn-icon">💰</span>Deposit
+          </a>
+          <a href="#" class="qa-btn">
+            <span class="qa-btn-icon">💸</span>Transfer
+          </a>
+          <a href="#" class="qa-btn">
+            <span class="qa-btn-icon">🧾</span>Pay Bills
+          </a>
+          <a href="contact.html" class="qa-btn">
+            <span class="qa-btn-icon">🎧</span>Support
+          </a>
+        </div>
+      </div>
+
+      <!-- eKYC Status -->
+      <div class="dash-card kyc-status-card">
+        <h3>eKYC Status</h3>
+        <div class="kyc-status-row"><span class="kyc-status-key">Identity Check</span><span class="kyc-badge-ok">✓ Verified</span></div>
+        <div class="kyc-status-row"><span class="kyc-status-key">Document Type</span><span style="font-size:13px;font-weight:600;color:var(--secondary);">Malaysian myKad</span></div>
+        <div class="kyc-status-row"><span class="kyc-status-key">Reference No</span><span class="kyc-badge-ref" id="kycRef">—</span></div>
+        <div class="kyc-status-row"><span class="kyc-status-key">Account Status</span><span class="kyc-badge-ok">✓ Active</span></div>
+      </div>
+
+      <!-- Security -->
+      <div class="dash-card" style="margin-top:20px;">
+        <h3>Security</h3>
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.9;">
+          <div>🔒 Last login: <strong style="color:var(--secondary);" id="lastLogin">–</strong></div>
+          <div>📍 Device: Chrome on Windows</div>
+          <div>✅ 2FA: Enabled</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── First-transaction modal ────────────────────────────────────────────── -->
+<div class="txn-modal-overlay" id="txnModal" style="display:none;">
+  <div class="txn-modal">
+    <div class="txn-modal-icon">🎉</div>
+    <div class="txn-modal-title">First Transaction!</div>
+    <div class="txn-modal-sub">You are about to make your first ever deposit into your NexaBank account. This milestone will be recorded.</div>
+    <div class="txn-modal-details">
+      <div class="txn-modal-row"><span class="txn-modal-key">Account</span><span class="txn-modal-val">NexaSave-i •••• 8801</span></div>
+      <div class="txn-modal-row"><span class="txn-modal-key">Transaction Type</span><span class="txn-modal-val">Initial Deposit</span></div>
+      <div class="txn-modal-row"><span class="txn-modal-key">Amount</span><span class="txn-modal-val green">+ RM 500.00</span></div>
+      <div class="txn-modal-row"><span class="txn-modal-key">Balance Before</span><span class="txn-modal-val">RM 0.00</span></div>
+      <div class="txn-modal-row"><span class="txn-modal-key">Balance After</span><span class="txn-modal-val green">RM 500.00</span></div>
+    </div>
+    <button class="btn-modal-close" onclick="confirmFirstTxn()">Confirm Deposit</button>
+  </div>
+</div>
+
+<!-- ── Consent Banner ─────────────────────────────────────────────────────── -->
+<div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
+  <div class="consent-body">
+    <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
+    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <div class="consent-categories">
+      <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
+      <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
+      <label class="consent-category"><input type="checkbox" id="consent-analytics"> Analytics</label>
+      <label class="consent-category"><input type="checkbox" id="consent-marketing"> Marketing</label>
+    </div>
+  </div>
+  <div class="consent-actions">
+    <button class="consent-btn consent-btn-accept" id="consent-accept">Accept All</button>
+    <button class="consent-btn consent-btn-reject" id="consent-reject">Reject Non-Essential</button>
+  </div>
+</div>
+
+<script src="js/datalayer.js"></script>
+<script src="js/main.js"></script>
+<script>
+  var TXN_ID = "TXN-" + Date.now().toString(36).toUpperCase();
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Date display
+    document.getElementById("ftDate").innerHTML =
+      new Date().toLocaleDateString("en-MY", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
+    document.getElementById("lastLogin").textContent =
+      new Date().toLocaleString("en-MY", { dateStyle: "medium", timeStyle: "short" });
+
+    // eKYC reference from session (set by ekyc.html after verification)
+    try {
+      var ekyc = JSON.parse(sessionStorage.getItem("nexaEKYC") || "{}");
+      if (ekyc.ref) document.getElementById("kycRef").textContent = ekyc.ref;
+    } catch (e) {}
+
+    // Fire page view with user context
+    if (window.NexaBankDL) {
+      window.NexaBankDL.pageView({
+        pageName: "NexaBank | First Transaction – AHakim",
+        pageCategory: "Authenticated",
+        pageSubCategory: "First Transaction",
+        pageType: "dashboard",
+        pageLanguage: "en",
+      });
+    }
+  });
+
+  // ── Show deposit modal ───────────────────────────────────────────────────
+  function showFirstTxnModal() {
+    document.getElementById("txnModal").style.display = "flex";
+  }
+
+  // ── Confirm deposit — fires firstTransaction datalayer event ─────────────
+  function confirmFirstTxn() {
+    document.getElementById("txnModal").style.display = "none";
+
+    if (window.NexaBankDL) {
+      window.NexaBankDL.firstTransaction({
+        username:        "AHakim",
+        transactionID:   TXN_ID,
+        transactionType: "credit",
+        amount:          500.00,
+        currency:        "MYR",
+        accountNo:       "••••••8801",
+        description:     "Initial Deposit – NexaSave-i",
+      });
+    }
+
+    // Update UI to reflect the deposit
+    document.getElementById("accBalance").textContent  = "RM 500.00";
+    document.getElementById("zeroBadge").style.display = "none";
+
+    // Append the first transaction to the list
+    var empty = document.getElementById("txnEmpty");
+    var list  = document.getElementById("txnList");
+    empty.style.display = "none";
+    list.style.display  = "block";
+
+    var now = new Date().toLocaleString("en-MY", { dateStyle: "medium", timeStyle: "short" });
+    list.innerHTML =
+      '<li class="txn-item">' +
+        '<div class="txn-left">' +
+          '<div class="txn-icon">🎉</div>' +
+          '<div>' +
+            '<div class="txn-name">Initial Deposit — First Transaction</div>' +
+            '<div class="txn-date">' + now + ' · Ref: ' + TXN_ID + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="txn-amt credit">+ RM 500.00</div>' +
+      '</li>';
+
+    // Celebration toast
+    showToast("🎉 First transaction recorded! Welcome to NexaBank, AHakim.");
+  }
+
+  // ── Simple toast ─────────────────────────────────────────────────────────
+  function showToast(msg) {
+    var toast = document.createElement("div");
+    toast.textContent = msg;
+    toast.style.cssText = [
+      "position:fixed", "bottom:90px", "left:50%", "transform:translateX(-50%)",
+      "background:var(--secondary)", "color:#fff", "padding:13px 24px",
+      "border-radius:8px", "font-size:13.5px", "font-weight:600",
+      "border-left:4px solid var(--primary)", "z-index:9998",
+      "box-shadow:0 4px 20px rgba(0,0,0,.25)", "max-width:90vw", "text-align:center",
+      "transition:opacity .4s",
+    ].join(";");
+    document.body.appendChild(toast);
+    setTimeout(function () { toast.style.opacity = "0"; }, 3500);
+    setTimeout(function () { if (toast.parentNode) toast.parentNode.removeChild(toast); }, 3900);
+  }
+</script>
+</body>
+</html>

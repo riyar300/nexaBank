@@ -433,5 +433,23 @@
     plCalcID = null; // reset so a new session ID is assigned on next use
   }
 </script>
+
+<!-- ── Consent Banner ─────────────────────────────────────────────────────── -->
+<div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
+  <div class="consent-body">
+    <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
+    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <div class="consent-categories">
+      <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
+      <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
+      <label class="consent-category"><input type="checkbox" id="consent-analytics"> Analytics</label>
+      <label class="consent-category"><input type="checkbox" id="consent-marketing"> Marketing</label>
+    </div>
+  </div>
+  <div class="consent-actions">
+    <button class="consent-btn consent-btn-accept" id="consent-accept">Accept All</button>
+    <button class="consent-btn consent-btn-reject" id="consent-reject">Reject Non-Essential</button>
+  </div>
+</div>
 </body>
 </html>

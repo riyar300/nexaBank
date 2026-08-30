@@ -796,6 +796,61 @@
     sendToAEP(xdm);
   };
 
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * CONSENT UPDATE
+   * XDM eventType: consent.preferences-updated
+   * Fire when the user accepts or rejects the cookie/consent banner.
+   *
+   * @param {object} data
+   *   decision    : "accept" | "reject"
+   *   categories  : { analytics: bool, marketing: bool, functional: bool }
+   *   trigger     : "banner" | "preferences-modal"  (default "banner")
+   */
+  NexaBankDL.consentUpdate = function (data) {
+    data = data || {};
+    var decision   = data.decision   || "reject";
+    var categories = data.categories || { analytics: false, marketing: false, functional: false };
+    var trigger    = data.trigger    || "banner";
+
+    var xdm = buildXDMBase("consent.preferences-updated");
+    xdm.consentStrings = [{
+      consentStandard: "IAB TCF",
+      consentStandardVersion: "2.0",
+      consentString: decision === "accept" ? "opt-in" : "opt-out",
+      gdprApplies: true,
+    }];
+    xdm._nexabank.consent = {
+      decision:   decision,
+      trigger:    trigger,
+      timestamp:  new Date().toISOString(),
+      categories: {
+        analytics:  !!categories.analytics,
+        marketing:  !!categories.marketing,
+        functional: !!categories.functional,
+      },
+    };
+
+    // Persist to localStorage so banner isn't shown again on next visit
+    try {
+      localStorage.setItem("nexabank_consent", JSON.stringify({
+        decision:   decision,
+        categories: xdm._nexabank.consent.categories,
+        timestamp:  xdm._nexabank.consent.timestamp,
+      }));
+    } catch (e) {}
+
+    pushEvent("nexabank.consent." + decision, {
+      decision:   decision,
+      trigger:    trigger,
+      categories: xdm._nexabank.consent.categories,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
+
   // ─── clearHistory() — public utility ─────────────────────────────────────
   NexaBankDL.clearHistory = function () {
     try { localStorage.removeItem(DL_STORE_KEY); } catch (e) {}
@@ -809,34 +864,107 @@
     return window.adobeDataLayer.slice();
   };
 
-  // ─── Debug badge (visible in browser when debugMode = true) ───────────────
-  if (CONFIG.debugMode) {
-    document.addEventListener("DOMContentLoaded", function () {
-      var count = window.adobeDataLayer.length;
-      var badge = document.createElement("div");
-      badge.id = "dl-debug-badge";
-      badge.title = "Adobe DataLayer Debug Mode — window.adobeDataLayer is active. Click to see history in console.";
-      badge.style.cursor = "pointer";
-      badge.textContent = "📊 AEP DataLayer (" + count + ")";
-      badge.addEventListener("click", function () {
-        console.group("%c[NexaBank DataLayer] Full Event History (" + window.adobeDataLayer.length + " events)", "color:#c8960c;font-weight:bold;font-size:13px;");
-        window.adobeDataLayer.forEach(function (evt, i) {
-          console.log("%c[" + i + "] " + evt.event + " @ " + (evt._ts || ""), "color:#57606a;font-size:11px;", evt);
-        });
-        console.log("%cTip: NexaBankDL.clearHistory() resets the history for a fresh demo.", "color:#3b82d4;font-style:italic;");
-        console.groupEnd();
-        // update count in badge
-        badge.textContent = "📊 AEP DataLayer (" + window.adobeDataLayer.length + ")";
-      });
+  // ═══════════════════════════════════════════════════════════════════════════
 
-      // Update count whenever new events arrive (poll every 500ms)
-      setInterval(function () {
-        badge.textContent = "📊 AEP DataLayer (" + window.adobeDataLayer.length + ")";
-      }, 500);
+  /**
+   * eKYC STEP
+   * XDM eventType: web.formFilledOut
+   * Fire on each step of the myKad eKYC verification flow.
+   *
+   *   step = "start"         — user lands on the eKYC page
+   *   step = "front-upload"  — myKad front image selected/uploaded
+   *   step = "back-upload"   — myKad back image selected/uploaded
+   *   step = "selfie"        — selfie/liveness image selected/uploaded
+   *   step = "submit"        — user submits all docs for verification
+   *   step = "verified"      — mock verification passes
+   *   step = "error"         — upload or verification failure
+   *
+   * @param {object} data
+   *   formID       : persistent ID across all steps
+   *   step         : one of the step strings above
+   *   documentType : "myKad" (default)
+   *   errorReason  : string (only on "error")
+   */
+  NexaBankDL.eKYCStep = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("web.formFilledOut");
+    xdm.web.webFormFilledOut = {
+      name: "eKYC – myKad Verification",
+      ID:   data.formID || generateInteractionId(),
+      type: "kyc",
+      step: data.step   || "start",
+    };
+    xdm._nexabank.ekyc = {
+      formID:       xdm.web.webFormFilledOut.ID,
+      step:         data.step         || "start",
+      documentType: data.documentType || "myKad",
+      errorReason:  data.errorReason  || null,
+      timestamp:    new Date().toISOString(),
+    };
 
-      document.body.appendChild(badge);
+    pushEvent("nexabank.ekyc." + (data.step || "start"), {
+      formID:       xdm._nexabank.ekyc.formID,
+      step:         xdm._nexabank.ekyc.step,
+      documentType: xdm._nexabank.ekyc.documentType,
+      errorReason:  xdm._nexabank.ekyc.errorReason,
+      xdm: xdm,
     });
-  }
+
+    sendToAEP(xdm);
+    return xdm.web.webFormFilledOut.ID;
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * FIRST TRANSACTION
+   * XDM eventType: commerce.purchases
+   * Fire when a newly onboarded user records their very first transaction.
+   *
+   * @param {object} data
+   *   username        : string
+   *   transactionID   : string
+   *   transactionType : "credit" | "debit"
+   *   amount          : number
+   *   currency        : "MYR" (default)
+   *   accountNo       : masked string
+   *   description     : string
+   */
+  NexaBankDL.firstTransaction = function (data) {
+    data = data || {};
+    var xdm = buildXDMBase("commerce.purchases");
+    xdm.commerce = {
+      order: {
+        purchaseID:    data.transactionID || generateInteractionId(),
+        currencyCode:  data.currency      || "MYR",
+        priceTotal:    data.amount        || 0,
+      },
+    };
+    xdm._nexabank.firstTransaction = {
+      username:        data.username        || "",
+      transactionID:   xdm.commerce.order.purchaseID,
+      transactionType: data.transactionType || "credit",
+      amount:          data.amount          || 0,
+      currency:        data.currency        || "MYR",
+      accountNo:       data.accountNo       || "",
+      description:     data.description     || "",
+      isFirstTxn:      true,
+      timestamp:       new Date().toISOString(),
+    };
+
+    pushEvent("nexabank.transaction.first", {
+      username:        xdm._nexabank.firstTransaction.username,
+      transactionID:   xdm._nexabank.firstTransaction.transactionID,
+      transactionType: xdm._nexabank.firstTransaction.transactionType,
+      amount:          xdm._nexabank.firstTransaction.amount,
+      currency:        xdm._nexabank.firstTransaction.currency,
+      description:     xdm._nexabank.firstTransaction.description,
+      isFirstTxn:      true,
+      xdm: xdm,
+    });
+
+    sendToAEP(xdm);
+  };
 
   // Expose
   window.NexaBankDL = NexaBankDL;

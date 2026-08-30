@@ -31,6 +31,7 @@
     wireNavDataLayer();
     wireCTADataLayer();
     firePageView();
+    initConsentBanner();
   });
 
   // ─── Page View ─────────────────────────────────────────────────────────────
@@ -368,4 +369,57 @@
   function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   }
+
+  // ─── Consent Banner ────────────────────────────────────────────────────────
+  function initConsentBanner() {
+    var banner = document.getElementById("consent-banner");
+    if (!banner) return;
+
+    // Don't show if consent was already stored
+    try {
+      if (localStorage.getItem("nexabank_consent")) return;
+    } catch (e) {}
+
+    // Slide the banner up after a short delay
+    setTimeout(function () { banner.classList.add("is-visible"); }, 600);
+
+    document.getElementById("consent-accept").addEventListener("click", function () {
+      _dismissBanner(banner);
+      if (window.NexaBankDL) {
+        window.NexaBankDL.consentUpdate({
+          decision: "accept",
+          trigger: "banner",
+          categories: {
+            analytics:  document.getElementById("consent-analytics").checked  || true,
+            marketing:  document.getElementById("consent-marketing").checked  || true,
+            functional: document.getElementById("consent-functional").checked || true,
+          },
+        });
+      }
+    });
+
+    document.getElementById("consent-reject").addEventListener("click", function () {
+      _dismissBanner(banner);
+      if (window.NexaBankDL) {
+        window.NexaBankDL.consentUpdate({
+          decision: "reject",
+          trigger: "banner",
+          categories: {
+            analytics:  false,
+            marketing:  false,
+            functional: document.getElementById("consent-functional").checked,
+          },
+        });
+      }
+    });
+  }
+
+  function _dismissBanner(banner) {
+    banner.classList.remove("is-visible");
+    // Remove from DOM after the slide-out transition finishes
+    setTimeout(function () {
+      if (banner.parentNode) banner.parentNode.removeChild(banner);
+    }, 400);
+  }
+
 })();
