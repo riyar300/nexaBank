@@ -125,38 +125,17 @@
   var DL_MAX_EVENTS      = 200;   // cap to prevent unbounded storage growth
 
   // ── Page-load deduplication ──────────────────────────────────────────────
-  // A page-scoped event (pageView, productImpression) should fire ONCE per
-  // actual page load, not once per script execution or tab revisit that
-  // replays from the same localStorage snapshot.
+  // A page-scoped event (pageView, productImpression) must fire exactly once
+  // per page load — never duplicated when navigating back to the same page.
   //
-  // Strategy: generate a unique loadID for each new page load and store it
-  // in sessionStorage. On rehydration we only skip pushing again if an event
-  // with the SAME loadID + eventName + pageURL already exists in storage.
-  // Cross-page navigations always produce a new loadID → their events fire.
+  // Each execution of datalayer.js IS one page load (scripts re-run on every
+  // full navigation). So we simply generate a fresh _loadID every time this
+  // script runs. The dedup check then looks for this ID in the persisted
+  // history — it will never exist because it was just created — so the event
+  // fires exactly once, then gets written to localStorage under this _loadID.
+  // On the next load a new _loadID is created and the cycle repeats cleanly.
 
-  var DL_LOAD_ID_KEY = "nexaBankDL_loadID";
-
-  // Each page load gets its own unique ID (tab-scoped via sessionStorage).
-  // We store it keyed by the current pathname so navigating to a new page
-  // always produces a new loadID for that page.
-  var _currentPath = window.location.pathname + window.location.search;
-  var _prevPath    = "";
-  try { _prevPath = sessionStorage.getItem(DL_LOAD_ID_KEY + "_path") || ""; } catch(e){}
-
-  // Assign a new loadID when the path changes (i.e. real navigation occurred)
-  var _loadID = "";
-  try {
-    if (_currentPath !== _prevPath) {
-      _loadID = "PL-" + Date.now() + "-" + Math.random().toString(36).substr(2, 6);
-      sessionStorage.setItem(DL_LOAD_ID_KEY, _loadID);
-      sessionStorage.setItem(DL_LOAD_ID_KEY + "_path", _currentPath);
-    } else {
-      // Same page — reuse the existing loadID so we can detect duplicates
-      _loadID = sessionStorage.getItem(DL_LOAD_ID_KEY) || ("PL-" + Date.now());
-    }
-  } catch(e) {
-    _loadID = "PL-" + Date.now();
-  }
+  var _loadID = "PL-" + Date.now() + "-" + Math.random().toString(36).substr(2, 6);
 
   function _loadFromStorage() {
     try {
@@ -175,8 +154,7 @@
   }
 
   // Rehydrate: seed window.adobeDataLayer with the persisted history.
-  var _persisted = _loadFromStorage();
-  window.adobeDataLayer = _persisted.slice();
+  window.adobeDataLayer = _loadFromStorage();
 
   // Wrap push() on this specific instance to write-through to localStorage.
   var _originalPush = Array.prototype.push;
@@ -186,26 +164,9 @@
     return result;
   };
 
-  // ── Dedup guard for page-scoped events ───────────────────────────────────
-  // Returns true if an event with the same loadID + eventName already exists
-  // in the persisted array, meaning it was already fired this page load.
-  function _alreadyFiredThisLoad(eventName) {
-    for (var i = _persisted.length - 1; i >= 0; i--) {
-      var e = _persisted[i];
-      if (e._loadID === _loadID && e.event === eventName) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function pushEvent(eventName, payload, pageScoped) {
-    // pageScoped = true  → only fire once per page load (dedup by loadID)
-    // pageScoped = false → always fire (user interactions, form events, etc.)
-    if (pageScoped && _alreadyFiredThisLoad(eventName)) {
-      log("SKIPPED (already fired this load): " + eventName, { _loadID: _loadID });
-      return null;
-    }
+  function pushEvent(eventName, payload) {
+    // _loadID is unique per page load — stamped on every event so you can
+    // group events by page in DevTools: adobeDataLayer.filter(e => e._loadID === "...")
     var entry = Object.assign(
       { event: eventName, _ts: new Date().toISOString(), _loadID: _loadID },
       payload
