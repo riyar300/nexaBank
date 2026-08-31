@@ -32,6 +32,7 @@
     wireCTADataLayer();
     firePageView();
     initConsentBanner();
+    initRegisterForm();
   });
 
   // ─── Page View ─────────────────────────────────────────────────────────────
@@ -284,6 +285,111 @@
             ctaDestination: btn.href || btn.dataset.ctaDestination || "",
             productCategory: btn.dataset.productCategory || "",
           });
+      });
+    });
+  }
+
+  // ─── Registration Form wiring (register.html) ──────────────────────────────
+  function initRegisterForm() {
+    var form = document.getElementById("registerForm");
+    if (!form) return;
+    var formID = null;
+    var formStarted = false;
+
+    // formStart – first field focused
+    var fields = form.querySelectorAll("input, select");
+    fields.forEach(function (field) {
+      field.addEventListener("focus", function () {
+        if (!formStarted) {
+          formStarted = true;
+          formID = window.NexaBankDL && window.NexaBankDL.formStart({
+            formName:   "Account Registration",
+            formType:   "registration",
+            firstField: field.name || field.id,
+          });
+        }
+      });
+    });
+
+    // formSubmit / formError on submit
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      // Collect validation errors
+      var errors = [];
+      var requiredFields = form.querySelectorAll("[required]");
+      requiredFields.forEach(function (field) {
+        if (field.type === "checkbox") {
+          if (!field.checked) errors.push(field.name || field.id);
+        } else if (!field.value.trim()) {
+          errors.push(field.name || field.id);
+        }
+      });
+
+      // Email format check
+      var emailEl = form.querySelector("#reg-email");
+      if (emailEl && emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
+        errors.push("email-format");
+      }
+
+      if (errors.length > 0) {
+        if (window.NexaBankDL) {
+          window.NexaBankDL.formError({
+            formID:        formID,
+            formName:      "Account Registration",
+            formType:      "registration",
+            formStep:      "submit",
+            errorFields:   errors,
+            errorMessages: errors.map(function (f) {
+              return f.charAt(0).toUpperCase() + f.slice(1) + " is required or invalid";
+            }),
+          });
+        }
+        _highlightRegisterErrors(form, errors);
+        return;
+      }
+
+      var accountTypeEl = form.querySelector("#reg-account-type");
+      if (window.NexaBankDL) {
+        window.NexaBankDL.formSubmit({
+          formID:          formID,
+          formName:        "Account Registration",
+          formType:        "registration",
+          enquiryCategory: accountTypeEl ? accountTypeEl.value : "current",
+          formFields:      window.NexaBankDL.collectFormFields(form),
+        });
+      }
+
+      // Show success state
+      var wrap = document.getElementById("registerFormWrap");
+      var success = document.getElementById("registerSuccess");
+      if (wrap) wrap.style.display = "none";
+      if (success) {
+        success.style.display = "block";
+        // Wire the datalayer CTA on the "Back to Home" button in the success panel
+        wireCTADataLayer();
+      }
+    });
+  }
+
+  function _highlightRegisterErrors(form, errorFields) {
+    errorFields.forEach(function (fieldName) {
+      var field = form.querySelector('[name="' + fieldName + '"], #' + fieldName);
+      if (!field) return;
+      field.classList.add("input-error");
+      var parent = field.closest(".form-group") || field.parentNode;
+      var err = parent.querySelector(".field-error");
+      if (!err) {
+        err = document.createElement("span");
+        err.className = "field-error";
+        parent.appendChild(err);
+      }
+      err.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + " is required";
+      ["input", "change"].forEach(function (ev) {
+        field.addEventListener(ev, function () {
+          field.classList.remove("input-error");
+          if (err) err.textContent = "";
+        }, { once: true });
       });
     });
   }

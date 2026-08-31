@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Open a NexaBank account online in minutes. Secure digital registration." />
+  <meta name="page-data" content='{
+    "pageName": "NexaBank | Open Account",
+    "pageCategory": "Registration",
+    "pageSubCategory": "Account Opening",
+    "pageType": "form",
+    "pageLanguage": "en"
+  }' />
+  <title>Open an Account | NexaBank</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <script src="https://assets.adobedtm.com/85462031b1ac/b9fe17ff5eac/launch-d019fc6cc177-development.min.js" async></script>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="container">
+    <div class="top-bar-left">
+      <span>🌐 Malaysia</span>
+      <a href="index.html" data-nav-section="Top Bar" data-nav-level="utility">Personal</a>
+    </div>
+    <div class="top-bar-right">
+      <a href="#" data-nav-section="Top Bar" data-nav-level="utility">Security Tips</a>
+      <a href="contact.html" data-nav-section="Top Bar" data-nav-level="utility">Help &amp; Support</a>
+      <a href="#" data-nav-section="Top Bar" data-nav-level="utility">Locate Us</a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo-wrap" aria-label="NexaBank Home">
+      <div class="logo-icon">N</div>
+      <div class="logo-text">
+        <div class="logo-name">NexaBank</div>
+        <div class="logo-tagline">Digital Banking</div>
+      </div>
+    </a>
+    <nav class="main-nav" id="mainNav" role="navigation" aria-label="Main navigation">
+      <div class="nav-item has-dropdown">
+        <a href="#" class="nav-link" data-nav-section="Personal" data-nav-level="primary">Personal ▾</a>
+        <ul class="dropdown-menu">
+          <li><a href="savings-deposits.html" data-nav-section="Personal" data-nav-level="secondary">Savings &amp; Deposits</a></li>
+          <li><a href="credit-cards.html" data-nav-section="Personal" data-nav-level="secondary">Credit Cards</a></li>
+          <li><a href="home-financing.html" data-nav-section="Personal" data-nav-level="secondary">Home Financing</a></li>
+          <li><a href="personal-financing.html" data-nav-section="Personal" data-nav-level="secondary">Personal Financing</a></li>
+        </ul>
+      </div>
+      <div class="nav-item">
+        <a href="contact.html" class="nav-link" data-nav-section="Contact" data-nav-level="primary">Contact Us</a>
+      </div>
+    </nav>
+    <div class="header-actions">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+      <a href="index.html" class="btn-header-login" data-cta-name="header-login" data-cta-location="Header">Login</a>
+    </div>
+  </div>
+</header>
+
+<div class="page-banner">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="index.html" data-nav-section="Breadcrumb" data-nav-level="utility">Home</a>
+      <span>›</span>
+      <span>Open an Account</span>
+    </div>
+    <h1>Open an Account</h1>
+    <p>Get started with NexaBank in minutes — no branch visit required</p>
+  </div>
+</div>
+
+<!-- Registration Form -->
+<section style="padding: 60px 0; background: var(--surface);">
+  <div class="container">
+    <div style="max-width: 680px; margin: 0 auto;">
+
+      <!-- Step indicator -->
+      <div style="display:flex; gap:0; margin-bottom:36px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border);">
+        <div style="flex:1; padding:12px 16px; background:var(--primary); color:var(--secondary); font-weight:700; font-size:13px; text-align:center;">
+          1. Personal Details
+        </div>
+        <div style="flex:1; padding:12px 16px; background:var(--white); color:var(--text-muted); font-size:13px; text-align:center; border-left:1px solid var(--border);">
+          2. Account Type
+        </div>
+        <div style="flex:1; padding:12px 16px; background:var(--white); color:var(--text-muted); font-size:13px; text-align:center; border-left:1px solid var(--border);">
+          3. Verification
+        </div>
+      </div>
+
+      <!-- Success message (hidden by default) -->
+      <div id="registerSuccess" style="display:none; background:#e8f5e9; border:1px solid #a5d6a7; border-radius:var(--radius); padding:32px; text-align:center;">
+        <div style="font-size:40px; margin-bottom:12px;">✅</div>
+        <h2 style="font-size:20px; font-weight:800; color:var(--green); margin-bottom:8px;">Application Submitted!</h2>
+        <p style="color:var(--text-muted); margin-bottom:20px;">Thank you for registering with NexaBank. We'll review your details and send a confirmation to your email within 24 hours.</p>
+        <a href="index.html" class="btn-primary"
+          data-cta-name="register-success-back-home"
+          data-cta-location="Registration Success">
+          Back to Home
+        </a>
+      </div>
+
+      <!-- Registration form card -->
+      <div id="registerFormWrap" style="background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:36px;">
+        <h2 style="font-size:20px; font-weight:800; margin-bottom:4px;">Personal Details</h2>
+        <p style="color:var(--text-muted); font-size:14px; margin-bottom:28px;">All fields marked * are required.</p>
+
+        <form id="registerForm" novalidate>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0 20px;">
+
+            <div class="form-group">
+              <label for="reg-fullname">Full Name (as per NRIC) *</label>
+              <input type="text" id="reg-fullname" name="fullName" placeholder="e.g. Ahmad bin Abdullah" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-nric">NRIC No. *</label>
+              <input type="text" id="reg-nric" name="nric" placeholder="e.g. 900101-14-5678" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-email">Email Address *</label>
+              <input type="email" id="reg-email" name="email" placeholder="you@example.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-mobile">Mobile Number *</label>
+              <input type="tel" id="reg-mobile" name="mobile" placeholder="+60 1X-XXX XXXX" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-dob">Date of Birth *</label>
+              <input type="date" id="reg-dob" name="dateOfBirth" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-nationality">Nationality *</label>
+              <select id="reg-nationality" name="nationality" required>
+                <option value="">Select nationality</option>
+                <option value="malaysian">Malaysian</option>
+                <option value="pr">Permanent Resident</option>
+                <option value="foreigner">Non-Malaysian</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="grid-column:1/-1;">
+              <label for="reg-address">Residential Address *</label>
+              <input type="text" id="reg-address" name="address" placeholder="Street, City, Postcode, State" required />
+            </div>
+
+            <div class="form-group">
+              <label for="reg-employment">Employment Status *</label>
+              <select id="reg-employment" name="employment" required>
+                <option value="">Select status</option>
+                <option value="employed">Employed</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="student">Student</option>
+                <option value="retired">Retired</option>
+                <option value="unemployed">Unemployed</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="reg-income">Monthly Income (RM)</label>
+              <select id="reg-income" name="monthlyIncome">
+                <option value="">Select range</option>
+                <option value="below2k">Below RM 2,000</option>
+                <option value="2k-5k">RM 2,000 – RM 5,000</option>
+                <option value="5k-10k">RM 5,000 – RM 10,000</option>
+                <option value="above10k">Above RM 10,000</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="grid-column:1/-1;">
+              <label for="reg-account-type">Account Type *</label>
+              <select id="reg-account-type" name="accountType" required>
+                <option value="">Select account type</option>
+                <option value="nexasave-i">NexaSave-i (Islamic Savings)</option>
+                <option value="fixed-deposit">NexaSave Fixed Deposit</option>
+                <option value="youth-savings">NexaYouth Savings (Age 18–30)</option>
+                <option value="current">NexaCurrent Account</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- Terms -->
+          <div style="margin:20px 0 24px; padding:16px; background:var(--surface); border-radius:var(--radius); font-size:13px; color:var(--text-muted);">
+            <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+              <input type="checkbox" id="reg-terms" name="termsAccepted" style="margin-top:2px; flex-shrink:0;" required />
+              <span>I confirm that the information provided is accurate and I agree to NexaBank's
+                <a href="#" style="color:var(--primary); font-weight:600;">Terms &amp; Conditions</a> and
+                <a href="#" style="color:var(--primary); font-weight:600;">Privacy Policy</a>. *
+              </span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-login" style="width:100%; font-size:15px; padding:14px;"
+            data-cta-name="register-submit"
+            data-cta-location="Registration Form">
+            Submit Application
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Security note -->
+      <div class="secure-badge" style="justify-content:center; margin-top:20px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2e7d32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        256-bit SSL Encrypted. Your data is protected.
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo-wrap">
+          <div class="logo-icon">N</div>
+          <div class="logo-text">
+            <div class="logo-name">NexaBank</div>
+            <div class="logo-tagline">Digital Banking</div>
+          </div>
+        </div>
+        <p>NexaBank Berhad is a licensed financial institution regulated by Bank Negara Malaysia. Member of PIDM.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Personal</h4>
+        <ul>
+          <li><a href="savings-deposits.html">Savings &amp; Deposits</a></li>
+          <li><a href="credit-cards.html">Credit Cards</a></li>
+          <li><a href="home-financing.html">Home Financing</a></li>
+          <li><a href="personal-financing.html">Personal Financing</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#">Fund Transfer</a></li>
+          <li><a href="#">Pay Bills</a></li>
+          <li><a href="register.html">Open Account</a></li>
+          <li><a href="#">Locate Branch</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="contact.html">Contact Us</a></li>
+          <li><a href="#">FAQs</a></li>
+          <li><a href="#">Security Tips</a></li>
+          <li><a href="#">Report Fraud</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 NexaBank Berhad (Reg. No. 200301012345). All rights reserved.</span>
+    <div class="footer-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Use</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/datalayer.js"></script>
+<script src="js/main.js"></script>
+
+</body>
+</html>
