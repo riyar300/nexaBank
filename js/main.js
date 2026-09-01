@@ -291,46 +291,78 @@
 
   // ─── Registration Form wiring (register.html) ──────────────────────────────
   function initRegisterForm() {
+    var emailStep  = document.getElementById("registerEmailStep");
+    var formWrap   = document.getElementById("registerFormWrap");
+    var continueBtn = document.getElementById("registerEmailContinue");
+    var backBtn    = document.getElementById("registerEmailBack");
+    var emailGate  = document.getElementById("reg-email-gate");
+    var emailErr   = document.getElementById("reg-email-gate-error");
+    var emailDisplay = document.getElementById("registerEmailDisplay");
+    var hiddenEmail  = document.getElementById("reg-email");
     var form = document.getElementById("registerForm");
-    if (!form) return;
-    var formID = null;
-    var formStarted = false;
 
-    // formStart – first field focused
-    var fields = form.querySelectorAll("input, select");
-    fields.forEach(function (field) {
-      field.addEventListener("focus", function () {
-        if (!formStarted) {
-          formStarted = true;
-          formID = window.NexaBankDL && window.NexaBankDL.formStart({
-            formName:   "Account Registration",
-            formType:   "registration",
-            firstField: field.name || field.id,
-          });
-        }
+    if (!emailStep || !formWrap || !form) return;
+
+    var formID = null;
+
+    // ── Step 1 → Step 2: validate email, fire formStart, reveal full form ──
+    function proceedToStep2() {
+      var email = emailGate.value.trim();
+      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      emailGate.classList.toggle("input-error", !valid);
+      emailErr.style.display = valid ? "none" : "block";
+
+      if (!valid) return;
+
+      // Carry the email into the hidden field so collectFormFields picks it up
+      hiddenEmail.value = email;
+      // Show confirmed email in Step 2 badge
+      if (emailDisplay) emailDisplay.textContent = email;
+
+      // ── formStart datalayer event ──
+      formID = window.NexaBankDL && window.NexaBankDL.formStart({
+        formName:   "Account Registration",
+        formType:   "registration",
+        firstField: "email",
       });
+
+      // Transition: hide Step 1, show Step 2
+      emailStep.style.display = "none";
+      formWrap.style.display  = "block";
+
+      // Focus first visible field in the full form
+      var firstInput = formWrap.querySelector("input:not([type=hidden]), select");
+      if (firstInput) firstInput.focus();
+    }
+
+    continueBtn.addEventListener("click", proceedToStep2);
+    emailGate.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); proceedToStep2(); }
     });
 
-    // formSubmit / formError on submit
+    // ── Back: return to Step 1, clear formID ──
+    if (backBtn) {
+      backBtn.addEventListener("click", function () {
+        formWrap.style.display  = "none";
+        emailStep.style.display = "block";
+        formID = null;
+        emailGate.focus();
+      });
+    }
+
+    // ── Step 2 submit: formSubmit / formError ──
     form.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      // Collect validation errors
       var errors = [];
-      var requiredFields = form.querySelectorAll("[required]");
-      requiredFields.forEach(function (field) {
+      form.querySelectorAll("[required]").forEach(function (field) {
         if (field.type === "checkbox") {
           if (!field.checked) errors.push(field.name || field.id);
         } else if (!field.value.trim()) {
           errors.push(field.name || field.id);
         }
       });
-
-      // Email format check
-      var emailEl = form.querySelector("#reg-email");
-      if (emailEl && emailEl.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailEl.value)) {
-        errors.push("email-format");
-      }
 
       if (errors.length > 0) {
         if (window.NexaBankDL) {
@@ -361,12 +393,10 @@
       }
 
       // Show success state
-      var wrap = document.getElementById("registerFormWrap");
       var success = document.getElementById("registerSuccess");
-      if (wrap) wrap.style.display = "none";
+      formWrap.style.display = "none";
       if (success) {
         success.style.display = "block";
-        // Wire the datalayer CTA on the "Back to Home" button in the success panel
         wireCTADataLayer();
       }
     });
