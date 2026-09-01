@@ -320,11 +320,12 @@
       // Show confirmed email in Step 2 badge
       if (emailDisplay) emailDisplay.textContent = email;
 
-      // ── formStart datalayer event ──
+      // ── formStart datalayer event — email captured as first form field ──
       formID = window.NexaBankDL && window.NexaBankDL.formStart({
         formName:   "Account Registration",
         formType:   "registration",
         firstField: "email",
+        formFields: { email: email },
       });
 
       // Transition: hide Step 1, show Step 2

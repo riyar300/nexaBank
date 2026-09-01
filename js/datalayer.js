@@ -337,7 +337,9 @@
   /**
    * FORM START
    * XDM eventType: web.formFilledOut  (AEP Web SDK standard)
-   * Fire when the user interacts with the first field of a form.
+   * Fire when the user confirms the first field and proceeds into the form.
+   * formData.formFields — optional { fieldName: value } map of captured fields
+   *                       (e.g. { email: "user@example.com" } from the email gate)
    */
   NexaBankDL.formStart = function (formData) {
     formData = formData || {};
@@ -348,18 +350,21 @@
       type:  formData.formType || "enquiry",
       step:  "start",
     };
+    var fields = formData.formFields ? _scrubFields(formData.formFields) : {};
     xdm._nexabank.form = {
       formID:               xdm.web.webFormFilledOut.ID,
       formName:             xdm.web.webFormFilledOut.name,
       formType:             xdm.web.webFormFilledOut.type,
       formStep:             "start",
       firstFieldInteracted: formData.firstField || "",
+      formFields:           fields,
     };
 
-    pushEvent("web.formFilledOut", {
-      formName: xdm._nexabank.form.formName,
-      formID:   xdm._nexabank.form.formID,
-      formStep: "start",
+    pushEvent("web.formStart", {
+      formName:   xdm._nexabank.form.formName,
+      formID:     xdm._nexabank.form.formID,
+      formStep:   "start",
+      formFields: fields,
       xdm: xdm,
     });
 
