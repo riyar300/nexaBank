@@ -101,6 +101,19 @@
           <span id="reg-email-gate-error" class="field-error" style="display:none;">Please enter a valid email address.</span>
         </div>
 
+        <!-- Marketing Consent -->
+        <div style="margin:18px 0 20px; padding:16px; background:var(--surface); border-radius:var(--radius); border:1px solid var(--border);">
+          <label style="display:flex; gap:10px; align-items:flex-start; cursor:pointer;">
+            <input type="checkbox" id="reg-marketing-consent" name="marketingConsent"
+              style="margin-top:3px; flex-shrink:0; accent-color:var(--primary); width:15px; height:15px;" />
+            <span style="font-size:13px; color:var(--text); line-height:1.55;">
+              I agree to receive personalised offers, product updates and marketing communications from Maybank via email, SMS and in-app notifications. You may unsubscribe at any time.
+              <a href="#" style="color:var(--primary); font-weight:600; white-space:nowrap;">Privacy Policy</a>
+            </span>
+          </label>
+          <span id="reg-consent-error" class="field-error" style="display:none; margin-top:8px;">Please accept the marketing consent to continue.</span>
+        </div>
+
         <button type="button" id="registerEmailContinue" class="btn-login" style="width:100%; font-size:15px; padding:14px; margin-top:8px;"
           data-cta-name="register-email-continue"
           data-cta-location="Registration Email Gate">

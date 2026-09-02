@@ -291,41 +291,46 @@
 
   // ─── Registration Form wiring (register.html) ──────────────────────────────
   function initRegisterForm() {
-    var emailStep  = document.getElementById("registerEmailStep");
-    var formWrap   = document.getElementById("registerFormWrap");
-    var continueBtn = document.getElementById("registerEmailContinue");
-    var backBtn    = document.getElementById("registerEmailBack");
-    var emailGate  = document.getElementById("reg-email-gate");
-    var emailErr   = document.getElementById("reg-email-gate-error");
+    var emailStep    = document.getElementById("registerEmailStep");
+    var formWrap     = document.getElementById("registerFormWrap");
+    var continueBtn  = document.getElementById("registerEmailContinue");
+    var backBtn      = document.getElementById("registerEmailBack");
+    var emailGate    = document.getElementById("reg-email-gate");
+    var emailErr     = document.getElementById("reg-email-gate-error");
+    var consentBox   = document.getElementById("reg-marketing-consent");
+    var consentErr   = document.getElementById("reg-consent-error");
     var emailDisplay = document.getElementById("registerEmailDisplay");
     var hiddenEmail  = document.getElementById("reg-email");
-    var form = document.getElementById("registerForm");
+    var form         = document.getElementById("registerForm");
 
     if (!emailStep || !formWrap || !form) return;
 
     var formID = null;
 
-    // ── Step 1 → Step 2: validate email, fire formStart, reveal full form ──
+    // ── Step 1 → Step 2: validate email + consent, fire formStart, reveal full form ──
     function proceedToStep2() {
-      var email = emailGate.value.trim();
-      var valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      var email        = emailGate.value.trim();
+      var emailValid   = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      var consentGiven = consentBox && consentBox.checked;
 
-      emailGate.classList.toggle("input-error", !valid);
-      emailErr.style.display = valid ? "none" : "block";
+      emailGate.classList.toggle("input-error", !emailValid);
+      emailErr.style.display = emailValid ? "none" : "block";
 
-      if (!valid) return;
+      if (consentErr) consentErr.style.display = consentGiven ? "none" : "block";
+
+      if (!emailValid || !consentGiven) return;
 
       // Carry the email into the hidden field so collectFormFields picks it up
       hiddenEmail.value = email;
       // Show confirmed email in Step 2 badge
       if (emailDisplay) emailDisplay.textContent = email;
 
-      // ── formStart datalayer event — email captured as first form field ──
+      // ── formStart datalayer event — email + consent captured ──
       formID = window.NexaBankDL && window.NexaBankDL.formStart({
         formName:   "Account Registration",
         formType:   "registration",
         firstField: "email",
-        formFields: { email: email },
+        formFields: { email: email, marketingConsent: "true" },
       });
 
       // Transition: hide Step 1, show Step 2
