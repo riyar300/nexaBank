@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="page-data" content='{
-    "pageName": "NexaBank | eKYC Verification",
+    "pageName": "Maybank | eKYC Verification",
     "pageCategory": "Onboarding",
     "pageSubCategory": "eKYC",
     "pageType": "form",
     "pageLanguage": "en"
   }' />
-  <title>eKYC Verification | NexaBank</title>
+  <title>eKYC Verification | Maybank</title>
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://assets.adobedtm.com/85462031b1ac/b9fe17ff5eac/launch-d019fc6cc177-development.min.js" async></script>
   <style>
@@ -177,7 +177,7 @@
   <a href="index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
     <div class="logo-icon">N</div>
     <div>
-      <div class="logo-name">NexaBank</div>
+      <div class="logo-name">Maybank</div>
       <div class="logo-tagline">Digital Banking</div>
     </div>
   </a>
@@ -301,7 +301,7 @@
         <div class="verified-wrap">
           <div class="verified-icon">✅</div>
           <div class="verified-title">Identity Verified!</div>
-          <div class="verified-sub">Your myKad has been successfully verified. Your NexaBank account is now active.</div>
+          <div class="verified-sub">Your myKad has been successfully verified. Your Maybank account is now active.</div>
           <div class="verified-ref">
             Reference No: <strong id="ekycRef">—</strong>
           </div>
@@ -322,7 +322,7 @@
 <div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
   <div class="consent-body">
     <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
-    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <p class="consent-text">Maybank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
     <div class="consent-categories">
       <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
       <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
@@ -344,7 +344,7 @@
 
   // Fire eKYC start on page load
   document.addEventListener("DOMContentLoaded", function () {
-    ekycFormID = window.NexaBankDL.eKYCStep({ step: "start", documentType: "myKad" });
+    ekycFormID = window.MaybankDL.eKYCStep({ step: "start", documentType: "myKad" });
   });
 
   // ── File upload wiring ──────────────────────────────────────────────────
@@ -360,7 +360,7 @@
       zone.classList.add("uploaded");
       fn.textContent = "✓ " + file.name;
       btn.disabled = false;
-      window.NexaBankDL.eKYCStep({ formID: ekycFormID, step: dlStep, documentType: "myKad" });
+      window.MaybankDL.eKYCStep({ formID: ekycFormID, step: dlStep, documentType: "myKad" });
     });
 
     // Drag & drop visual feedback
@@ -412,8 +412,8 @@
 
     // Fire datalayer on step advance (submit step fired separately)
     var stepMap = { 2: "back-upload-view", 3: "selfie-view", 4: "review" };
-    if (stepMap[n] && window.NexaBankDL) {
-      window.NexaBankDL.eKYCStep({ formID: ekycFormID, step: stepMap[n], documentType: "myKad" });
+    if (stepMap[n] && window.MaybankDL) {
+      window.MaybankDL.eKYCStep({ formID: ekycFormID, step: stepMap[n], documentType: "myKad" });
     }
   }
 
@@ -424,7 +424,7 @@
     btn.disabled = true;
 
     // Fire submit event
-    window.NexaBankDL.eKYCStep({ formID: ekycFormID, step: "submit", documentType: "myKad" });
+    window.MaybankDL.eKYCStep({ formID: ekycFormID, step: "submit", documentType: "myKad" });
 
     // Simulate a 2-second verification delay
     setTimeout(function () {
@@ -435,7 +435,7 @@
       try { sessionStorage.setItem("nexaEKYC", JSON.stringify({ ref: ref, user: "AHakim", ts: new Date().toISOString() })); } catch (e) {}
 
       // Fire verified event
-      window.NexaBankDL.eKYCStep({ formID: ekycFormID, step: "verified", documentType: "myKad" });
+      window.MaybankDL.eKYCStep({ formID: ekycFormID, step: "verified", documentType: "myKad" });
 
       goStep(5);
     }, 2000);

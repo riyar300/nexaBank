@@ -1,5 +1,5 @@
-/**
- * NexaBank Event-Driven Data Layer
+﻿/**
+ * Maybank Event-Driven Data Layer
  * Compatible with Adobe Experience Platform Web SDK (alloy.js)
  * XDM Schema structured for Banking Services
  *
@@ -29,7 +29,7 @@
   function log(event, payload) {
     if (CONFIG.debugMode) {
       console.groupCollapsed(
-        "%c[NexaBank DataLayer] " + event,
+        "%c[Maybank DataLayer] " + event,
         "color:#c8960c; font-weight:bold;"
       );
       console.log(payload);
@@ -64,7 +64,7 @@
       },
       _nexabank: {
         bank: {
-          brandName: "NexaBank",
+          brandName: "Maybank",
           country: "Malaysia",
           division: "Digital Banking",
         },
@@ -550,7 +550,7 @@
     data = data || {};
     var xdm = buildXDMBase("web.formFilledOut");
     xdm.web.webFormFilledOut = {
-      name: "Online Banking Login",
+      name: "Maybank Online Banking Login",
       ID:   data.formID || generateInteractionId(),
       type: "authentication",
       step: "attempt",
@@ -579,7 +579,7 @@
     data = data || {};
     var xdm = buildXDMBase("web.formFilledOut");
     xdm.web.webFormFilledOut = {
-      name: "Online Banking Login",
+      name: "Maybank Online Banking Login",
       ID:   data.formID || generateInteractionId(),
       type: "authentication",
       step: "complete",
@@ -609,7 +609,7 @@
     data = data || {};
     var xdm = buildXDMBase("web.formFilledOut");
     xdm.web.webFormFilledOut = {
-      name: "Online Banking Login",
+      name: "Maybank Online Banking Login",
       ID:   data.formID || generateInteractionId(),
       type: "authentication",
       step: "error",
@@ -839,7 +839,7 @@
 
     // Persist to localStorage so banner isn't shown again on next visit
     try {
-      localStorage.setItem("nexabank_consent", JSON.stringify({
+      localStorage.setItem("maybank_consent", JSON.stringify({
         decision:   decision,
         categories: xdm._nexabank.consent.categories,
         timestamp:  xdm._nexabank.consent.timestamp,

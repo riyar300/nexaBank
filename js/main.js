@@ -1,5 +1,5 @@
-/**
- * NexaBank – Main JavaScript
+﻿/**
+ * Maybank – Main JavaScript
  * Handles UI interactions, AEP Web SDK bootstrap, and datalayer event wiring
  */
 
@@ -114,7 +114,7 @@
           if (!formStarted) {
             formStarted = true;
             formID = window.NexaBankDL.formStart({
-              formName: "Online Banking Login",
+              formName: "Maybank Online Banking Login",
               formType: "authentication",
               firstField: field.name || field.id,
             });
@@ -143,7 +143,7 @@
         });
         window.NexaBankDL.formError({
           formID:        formID,
-          formName:      "Online Banking Login",
+          formName:      "Maybank Online Banking Login",
           formType:      "authentication",
           formStep:      "submit",
           errorFields:   errors,
@@ -174,7 +174,7 @@
         });
         window.NexaBankDL.formError({
           formID:        formID,
-          formName:      "Online Banking Login",
+          formName:      "Maybank Online Banking Login",
           formType:      "authentication",
           formStep:      "submit",
           errorFields:   ["credentials"],
@@ -191,7 +191,7 @@
       });
       window.NexaBankDL.formSubmit({
         formID:          formID,
-        formName:        "Online Banking Login",
+        formName:        "Maybank Online Banking Login",
         formType:        "authentication",
         enquiryCategory: "login",
       });
@@ -327,7 +327,7 @@
 
       // ── formStart datalayer event — email + consent captured ──
       formID = window.NexaBankDL && window.NexaBankDL.formStart({
-        formName:   "Account Registration",
+        formName:   "Maybank Account Registration",
         formType:   "registration",
         firstField: "email",
         formFields: { email: email, marketingConsent: "true" },
@@ -374,7 +374,7 @@
         if (window.NexaBankDL) {
           window.NexaBankDL.formError({
             formID:        formID,
-            formName:      "Account Registration",
+            formName:      "Maybank Account Registration",
             formType:      "registration",
             formStep:      "submit",
             errorFields:   errors,
@@ -391,7 +391,7 @@
       if (window.NexaBankDL) {
         window.NexaBankDL.formSubmit({
           formID:          formID,
-          formName:        "Account Registration",
+          formName:        "Maybank Account Registration",
           formType:        "registration",
           enquiryCategory: accountTypeEl ? accountTypeEl.value : "current",
           formFields:      window.NexaBankDL.collectFormFields(form),
@@ -519,7 +519,7 @@
 
     // Don't show if consent was already stored
     try {
-      if (localStorage.getItem("nexabank_consent")) return;
+      if (localStorage.getItem("maybank_consent")) return;
     } catch (e) {}
 
     // Slide the banner up after a short delay

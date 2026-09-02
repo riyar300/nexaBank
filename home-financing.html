@@ -1,17 +1,17 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="NexaBank Home Financing – Competitive rates and fast approval for your dream home." />
+  <meta name="description" content="Maybank Home Financing – Competitive rates and fast approval for your dream home." />
   <meta name="page-data" content='{
-    "pageName": "NexaBank | Home Financing",
+    "pageName": "Maybank | Home Financing",
     "pageCategory": "Personal",
     "pageSubCategory": "Home Financing",
     "pageType": "product",
     "pageLanguage": "en"
   }' />
-  <title>Home Financing | NexaBank</title>
+  <title>Home Financing | Maybank</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <script src="https://assets.adobedtm.com/85462031b1ac/b9fe17ff5eac/launch-d019fc6cc177-development.min.js" async></script>
@@ -33,10 +33,10 @@
 
 <header class="site-header">
   <div class="header-inner">
-    <a href="index.html" class="logo-wrap" aria-label="NexaBank Home">
+    <a href="index.html" class="logo-wrap" aria-label="Maybank Home">
       <div class="logo-icon">N</div>
       <div class="logo-text">
-        <div class="logo-name">NexaBank</div>
+        <div class="logo-name">Maybank</div>
         <div class="logo-tagline">Digital Banking</div>
       </div>
     </a>
@@ -214,7 +214,7 @@
 <section style="padding:50px 0; background:var(--white);">
   <div class="container">
     <div style="text-align:center;margin-bottom:36px;">
-      <h2 class="section-title">Why Choose NexaBank for Your Home?</h2>
+      <h2 class="section-title">Why Choose Maybank for Your Home?</h2>
     </div>
     <div class="features-grid">
       <div class="feature-item">
@@ -244,7 +244,7 @@
 <div style="background:var(--secondary);color:var(--white);padding:48px 0;text-align:center;">
   <div class="container">
     <h2 style="font-size:26px;font-weight:800;margin-bottom:10px;">Ready to buy your dream home?</h2>
-    <p style="color:rgba(255,255,255,.75);font-size:15px;margin-bottom:24px;">Speak to a NexaBank home financing specialist today.</p>
+    <p style="color:rgba(255,255,255,.75);font-size:15px;margin-bottom:24px;">Speak to a Maybank home financing specialist today.</p>
     <a href="contact.html" class="btn-primary" data-cta-name="home-financing-cta" data-cta-location="Home Financing Page CTA">Enquire Now</a>
   </div>
 </div>
@@ -256,11 +256,11 @@
         <div class="logo-wrap">
           <div class="logo-icon">N</div>
           <div class="logo-text">
-            <div class="logo-name">NexaBank</div>
+            <div class="logo-name">Maybank</div>
             <div class="logo-tagline">Digital Banking</div>
           </div>
         </div>
-        <p>NexaBank Berhad is a licensed financial institution regulated by Bank Negara Malaysia. Member of PIDM.</p>
+        <p>Malayan Banking Berhad is a licensed financial institution regulated by Bank Negara Malaysia. Member of PIDM.</p>
       </div>
       <div class="footer-col">
         <h4>Personal</h4>
@@ -292,7 +292,7 @@
       <div class="footer-col">
         <h4>Company</h4>
         <ul>
-          <li><a href="#">About NexaBank</a></li>
+          <li><a href="#">About Maybank</a></li>
           <li><a href="#">Careers</a></li>
           <li><a href="#">Media Room</a></li>
           <li><a href="#">CSR</a></li>
@@ -301,7 +301,7 @@
     </div>
   </div>
   <div class="footer-bottom">
-    <span>© 2025 NexaBank Berhad (Reg. No. 200301012345). All rights reserved.</span>
+    <span>© 2025 Malayan Banking Berhad (Reg. No. 196001000142). All rights reserved.</span>
     <div class="footer-bottom-links">
       <a href="#">Privacy Policy</a>
       <a href="#">Terms of Use</a>
@@ -315,8 +315,8 @@
 <script>
   // ── Product Impression – Home Financing page ──────────────────────────────
   document.addEventListener("DOMContentLoaded", function () {
-    if (window.NexaBankDL) {
-      window.NexaBankDL.productImpression([
+    if (window.MaybankDL) {
+      window.MaybankDL.productImpression([
         { productID: "NB-HF-001", productName: "NexaHome Flexi",     productCategory: "Loans & Financing", productSubCategory: "Home Loan"        },
         { productID: "NB-HF-002", productName: "NexaHome-i",         productCategory: "Loans & Financing", productSubCategory: "Islamic Home Loan" },
         { productID: "NB-HF-003", productName: "NexaHome Refinance", productCategory: "Loans & Financing", productSubCategory: "Refinancing"       },
@@ -330,9 +330,9 @@
   // Fire calculator start on first input interaction
   document.querySelectorAll("#calcStep1 input").forEach(function (field) {
     field.addEventListener("focus", function () {
-      if (!homeCalcID && window.NexaBankDL) {
+      if (!homeCalcID && window.MaybankDL) {
         homeCalcID = "HC-" + Date.now();
-        window.NexaBankDL.calculatorInteraction({
+        window.MaybankDL.calculatorInteraction({
           calculatorType: "Home Financing",
           calculatorID:   homeCalcID,
           step:           "start",
@@ -357,8 +357,8 @@
     document.getElementById("calcStep2").style.display = "block";
 
     // ── DataLayer: inputs submitted → email gate ─────────────────
-    if (window.NexaBankDL) {
-      window.NexaBankDL.calculatorInteraction({
+    if (window.MaybankDL) {
+      window.MaybankDL.calculatorInteraction({
         calculatorType: "Home Financing",
         calculatorID:   homeCalcID,
         step:           "emailGate",
@@ -399,8 +399,8 @@
     document.getElementById("calcEmailSent").textContent    = email;
 
     // ── DataLayer: result shown ───────────────────────────────────
-    if (window.NexaBankDL) {
-      window.NexaBankDL.calculatorInteraction({
+    if (window.MaybankDL) {
+      window.MaybankDL.calculatorInteraction({
         calculatorType: "Home Financing",
         calculatorID:   homeCalcID,
         step:           "complete",
@@ -422,7 +422,7 @@
 <div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
   <div class="consent-body">
     <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
-    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <p class="consent-text">Maybank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
     <div class="consent-categories">
       <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
       <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>

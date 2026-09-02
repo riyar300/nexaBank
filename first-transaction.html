@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="page-data" content='{
-    "pageName": "NexaBank | First Transaction",
+    "pageName": "Maybank | First Transaction",
     "pageCategory": "Authenticated",
     "pageSubCategory": "First Transaction",
     "pageType": "dashboard",
     "pageLanguage": "en"
   }' />
-  <title>Welcome, AHakim | NexaBank</title>
+  <title>Welcome, AHakim | Maybank</title>
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://assets.adobedtm.com/85462031b1ac/b9fe17ff5eac/launch-d019fc6cc177-development.min.js" async></script>
   <style>
@@ -198,7 +198,7 @@
     <a href="index.html" class="dash-logo">
       <div class="logo-icon">N</div>
       <div>
-        <div class="logo-name">NexaBank</div>
+        <div class="logo-name">Maybank</div>
         <div class="logo-tagline">Digital Banking</div>
       </div>
     </a>
@@ -226,7 +226,7 @@
   <div class="welcome-inner">
     <div class="welcome-text">
       <div class="welcome-badge">🎉 New Customer</div>
-      <h2>Welcome to NexaBank, <span>AHakim</span>! 👋</h2>
+      <h2>Welcome to Maybank, <span>AHakim</span>! 👋</h2>
       <p>Your identity has been verified. Your account is now fully active.</p>
     </div>
     <div style="font-size:13px;color:rgba(255,255,255,.5);text-align:right;" id="ftDate"></div>
@@ -329,7 +329,7 @@
   <div class="txn-modal">
     <div class="txn-modal-icon">🎉</div>
     <div class="txn-modal-title">First Transaction!</div>
-    <div class="txn-modal-sub">You are about to make your first ever deposit into your NexaBank account. This milestone will be recorded.</div>
+    <div class="txn-modal-sub">You are about to make your first ever deposit into your Maybank account. This milestone will be recorded.</div>
     <div class="txn-modal-details">
       <div class="txn-modal-row"><span class="txn-modal-key">Account</span><span class="txn-modal-val">NexaSave-i •••• 8801</span></div>
       <div class="txn-modal-row"><span class="txn-modal-key">Transaction Type</span><span class="txn-modal-val">Initial Deposit</span></div>
@@ -345,7 +345,7 @@
 <div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
   <div class="consent-body">
     <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
-    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <p class="consent-text">Maybank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
     <div class="consent-categories">
       <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
       <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
@@ -378,9 +378,9 @@
     } catch (e) {}
 
     // Fire page view with user context
-    if (window.NexaBankDL) {
-      window.NexaBankDL.pageView({
-        pageName: "NexaBank | First Transaction – AHakim",
+    if (window.MaybankDL) {
+      window.MaybankDL.pageView({
+        pageName: "Maybank | First Transaction – AHakim",
         pageCategory: "Authenticated",
         pageSubCategory: "First Transaction",
         pageType: "dashboard",
@@ -398,8 +398,8 @@
   function confirmFirstTxn() {
     document.getElementById("txnModal").style.display = "none";
 
-    if (window.NexaBankDL) {
-      window.NexaBankDL.firstTransaction({
+    if (window.MaybankDL) {
+      window.MaybankDL.firstTransaction({
         username:        "AHakim",
         transactionID:   TXN_ID,
         transactionType: "credit",
@@ -434,7 +434,7 @@
       '</li>';
 
     // Celebration toast
-    showToast("🎉 First transaction recorded! Welcome to NexaBank, AHakim.");
+    showToast("🎉 First transaction recorded! Welcome to Maybank, AHakim.");
   }
 
   // ── Simple toast ─────────────────────────────────────────────────────────

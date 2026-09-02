@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="page-data" content='{
-    "pageName": "NexaBank | Dashboard",
+    "pageName": "Maybank | Dashboard",
     "pageCategory": "Authenticated",
     "pageSubCategory": "Dashboard",
     "pageType": "dashboard",
     "pageLanguage": "en"
   }' />
-  <title>My Dashboard | NexaBank</title>
+  <title>My Dashboard | Maybank</title>
   <link rel="stylesheet" href="css/styles.css" />
   <script src="https://assets.adobedtm.com/85462031b1ac/b9fe17ff5eac/launch-d019fc6cc177-development.min.js" async></script>
   <style>
@@ -154,7 +154,7 @@
     <a href="index.html" class="dash-logo">
       <div class="logo-icon">N</div>
       <div>
-        <div class="logo-name">NexaBank</div>
+        <div class="logo-name">Maybank</div>
         <div class="logo-tagline">Digital Banking</div>
       </div>
     </a>
@@ -183,7 +183,7 @@
   <div class="welcome-inner">
     <div class="welcome-text">
       <h2>Good day, <span id="welcomeName">User</span> 👋</h2>
-      <p>Here's a summary of your NexaBank accounts</p>
+      <p>Here's a summary of your Maybank accounts</p>
     </div>
     <div class="welcome-date" id="dashDate"></div>
   </div>
@@ -216,7 +216,7 @@
             <div class="acc-tile-left">
               <div class="acc-icon" style="background:#e3f0ff;">💳</div>
               <div>
-                <div class="acc-name">NexaCard Cashback</div>
+                <div class="acc-name">Maybank Cashback Card</div>
                 <div class="acc-num">•••• •••• •••• 4521</div>
               </div>
             </div>
@@ -229,7 +229,7 @@
             <div class="acc-tile-left">
               <div class="acc-icon" style="background:#e8f5e9;">🔒</div>
               <div>
-                <div class="acc-name">NexaSave Fixed Deposit</div>
+                <div class="acc-name">Maybank Fixed Deposit</div>
                 <div class="acc-num">Matures: 15 Jan 2026</div>
               </div>
             </div>
@@ -296,7 +296,7 @@
       <!-- Promo -->
       <div class="promo-dash">
         <div class="promo-tag">Exclusive for you</div>
-        <h4>Upgrade to NexaCard Platinum</h4>
+        <h4>Upgrade to Maybank Platinum Card</h4>
         <p>Enjoy airport lounge access, 5× travel rewards and up to RM 1M travel insurance.</p>
         <a href="card-application.html?card=platinum" class="btn-primary" style="font-size:13px;padding:9px 18px;"
           data-cta-name="dash-upgrade-card" data-cta-location="Dashboard Promo">Apply Now</a>
@@ -345,8 +345,8 @@
     new Date().toLocaleDateString("en-MY", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
 
   function logout() {
-    if (window.NexaBankDL) {
-      window.NexaBankDL.userLogout({
+    if (window.MaybankDL) {
+      window.MaybankDL.userLogout({
         username: sessionStorage.getItem("nexaUser") || "",
       });
     }
@@ -359,7 +359,7 @@
 <div id="consent-banner" role="dialog" aria-modal="false" aria-label="Cookie consent">
   <div class="consent-body">
     <div class="consent-title"><span class="consent-icon">🍪</span> We value your privacy</div>
-    <p class="consent-text">NexaBank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
+    <p class="consent-text">Maybank uses cookies to improve your experience, analyse site performance and serve relevant content. Read our <a href="#">Cookie Policy</a> and <a href="#">Privacy Notice</a> for details.</p>
     <div class="consent-categories">
       <label class="consent-category"><input type="checkbox" id="consent-necessary" checked disabled> Strictly Necessary</label>
       <label class="consent-category"><input type="checkbox" id="consent-functional"> Functional</label>
